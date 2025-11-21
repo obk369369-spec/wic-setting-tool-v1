@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>WIC 7번 세팅 도구 — 도구 카드 생성기 (주소 자동 수정 버전)</title>
+  <title>WIC 7번 세팅 도구 — 도구 카드 생성기 (여러 도구+A안)</title>
   <style>
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -10,15 +10,8 @@
       line-height: 1.4;
       font-size: 14px;
     }
-    h1 {
-      font-size: 20px;
-      margin-bottom: 4px;
-    }
-    h2 {
-      font-size: 16px;
-      margin-top: 16px;
-      margin-bottom: 4px;
-    }
+    h1 { font-size: 20px; margin-bottom: 4px; }
+    h2 { font-size: 16px; margin-top: 16px; margin-bottom: 4px; }
     .section {
       border: 1px solid #ccc;
       border-radius: 8px;
@@ -53,9 +46,7 @@
       border: 1px solid #ccc;
       background: #f5f5f5;
     }
-    button:hover {
-      background: #e9e9e9;
-    }
+    button:hover { background: #e9e9e9; }
     .cards {
       display: flex;
       flex-direction: column;
@@ -91,7 +82,6 @@
   </style>
 </head>
 <body>
-  <!-- 📘 범용 지시문 (요약·내장 버전) -->
   <div class="section">
     <h1>WIC 7번 세팅 도구 — 도구 카드 관리</h1>
     <p class="small">
@@ -101,7 +91,6 @@
     </p>
   </div>
 
-  <!-- ① 업로드 환경 기본 설정 -->
   <div class="section">
     <h2>① 업로드 환경 설정 (한 번만 입력)</h2>
     <label for="githubBase">GitHub 업로드 기본 경로</label>
@@ -119,31 +108,29 @@
     </p>
   </div>
 
-  <!-- ② 한 줄 지시로 도구 카드 생성 -->
   <div class="section">
-    <h2>② 한 줄 지시로 도구 카드 생성</h2>
-    <label for="singleLine">도구 한 줄 지시</label>
+    <h2>② 여러 도구 한꺼번에 입력 (A안: 도구 사이 빈 줄)</h2>
+    <label for="singleLine">도구 묶음 입력</label>
     <textarea id="singleLine"
-      placeholder="형식: 도구 이름 / (목적은 아래 줄에 이어서 여러 줄 가능)&#10;예: 새팅 도구 /&#10;월드산업정보센터의 사업에 필요한 도구들을 자동으로 플랫폼에 올린다."></textarea>
-    <button type="button" onclick="addToolCard()">도구 카드 생성</button>
+      placeholder="A안 예시 형식:&#10;1번 자동 안내서 도구 /&#10;온라인·오프라인 고객에게 안내서를 자동으로 보내고,&#10;후속 연락까지 도와주는 도구이다.&#10;&#10;2번 입찰 감시 도구 /&#10;나라장터와 KISTI 입찰 공고를 살펴보고,&#10;우리에게 중요한 공고를 빨리 찾는 도구이다.&#10;&#10;... (도구 사이 빈 줄 1칸)"></textarea>
+    <button type="button" onclick="addToolCards()">도구 카드 생성</button>
     <p class="small">
-      사용자는 가능한 한 이 입력칸에 이름과 목적만 적는다.
-      줄이 바뀌어도 도구는 이름과 목적을 인식하고, 나머지(카드, 주소, 상태표시, 정리본)는 세팅 도구가 자동으로 만든다.
+      여러 도구를 한꺼번에 넣을 수 있다. 도구와 도구 사이를 <strong>빈 줄 하나(엔터 두 번)</strong>
+      로만 구분하면, 각 덩어리가 자동으로 카드 하나씩 된다.
+      이름 줄에서만 <code>/</code> 앞은 이름, 나머지 줄은 모두 목적 텍스트로 처리된다.
     </p>
   </div>
 
-  <!-- ③ 도구 카드 리스트 -->
   <div class="section">
     <h2>③ 도구 카드 목록</h2>
     <div id="cards" class="cards"></div>
     <p class="small">
       각 카드는 ① 이름·목적 ② GitHub/Deno 업로드 주소
       ③ 업로드 상태 ④ 테스트 체크리스트를 가진다.
-      이 카드들을 기준으로 1번~9번 및 이후 도구들을 한눈에 관리한다.
+      이 카드들을 기준으로 1번~10번 및 이후 도구들을 한눈에 관리한다.
     </p>
   </div>
 
-  <!-- ④ 정리본 (근거 요약) -->
   <div class="section">
     <h2>④ 정리본 (도구 목록·업로드 상태 요약)</h2>
     <textarea id="summary" placeholder="카드를 만들면 여기 정리본이 자동 갱신된다."></textarea>
@@ -155,39 +142,33 @@
   </div>
 
   <script>
-    // ================================
-    // Ⅰ. 이름/목적 파싱 (여러 줄 허용)
-    // ================================
-    function parseSingleLine(raw, index) {
-      const text = raw.trim();
-      if (!text) {
-        return {
-          name: "도구 이름 미입력",
-          purpose: "도구 목적 미입력",
-          io: "입력·출력 미입력(필요 시 수정)"
-        };
-      }
+    // A안: 빈 줄(엔터 두 번)로 도구 블록 구분
+    function splitBlocks(raw) {
+      return raw
+        .split(/\n\s*\n+/)   // 빈 줄 하나 이상을 구분자로 사용
+        .map(b => b.trim())
+        .filter(b => b.length > 0);
+    }
 
-      const lines = text.split(/\r?\n/);
-
-      // 첫 줄에서만 “/” 기준으로 이름 분리
+    // 블록 하나 파싱: 첫 줄 이름/나머지 줄 목적
+    function parseBlock(blockText, index) {
+      const lines = blockText.split(/\r?\n/);
       const firstLine = (lines[0] || "").trim();
       let namePart = firstLine;
-      let purposeFromFirst = "";
+      let purposeFirst = "";
 
       if (firstLine.includes("/")) {
         const tmp = firstLine.split("/");
         namePart = (tmp[0] || "").trim();
-        purposeFromFirst = (tmp.slice(1).join("/")).trim();
+        purposeFirst = (tmp.slice(1).join("/")).trim();
       }
 
-      // 나머지 줄들은 목적에 이어 붙이기
       const restLines = lines.slice(1).join("\n").trim();
       let purpose = "";
-      if (purposeFromFirst && restLines) {
-        purpose = purposeFromFirst + "\n" + restLines;
-      } else if (purposeFromFirst) {
-        purpose = purposeFromFirst;
+      if (purposeFirst && restLines) {
+        purpose = purposeFirst + "\n" + restLines;
+      } else if (purposeFirst) {
+        purpose = purposeFirst;
       } else if (restLines) {
         purpose = restLines;
       } else {
@@ -203,115 +184,102 @@
       };
     }
 
-    // ================================
-    // Ⅱ. 도구 ID 생성 (아무 이름이나 허용)
-    // ================================
+    // 도구 ID 생성: 아무 이름이나 허용, 주소용 안전 문자열로 변환
     function makeToolId(name, index) {
-      // 공백 제거
       let base = name.trim();
-
       if (!base) {
         return "tool-" + index;
       }
-
-      // 공백 → 대시, 위험 문자는 대시로 치환
-      // 한글/숫자/일반 문자 등은 그대로 두고, / ? # 등만 제거
-      base = base.replace(/\s+/g, "-");
-      base = base.replace(/[\/\\?#&%]/g, "-");
-
-      // 너무 짧으면 보정
+      base = base.replace(/\s+/g, "-");          // 공백 → 대시
+      base = base.replace(/[\/\\?#&%]/g, "-");   // 위험 문자 제거
       if (!base || base === "-" || base === "--") {
         base = "tool-" + index;
       }
-
-      // 너무 길면 앞부분만 사용
       if (base.length > 40) {
         base = base.slice(0, 40);
       }
-
       return base;
     }
 
-    // ================================
-    // Ⅲ. 도구 카드 생성
-    // ================================
-    function addToolCard() {
+    // 여러 도구 카드 생성 (A안)
+    function addToolCards() {
       const rawText = document.getElementById("singleLine").value.trim();
       if (!rawText) {
-        alert("도구 한 줄(여러 줄) 지시를 먼저 입력해 주세요.");
+        alert("도구 묶음 텍스트를 먼저 입력해 주세요.");
         return;
       }
 
       const githubBase = document.getElementById("githubBase").value.trim();
       const denoBase = document.getElementById("denoBase").value.trim();
-
       const cardsContainer = document.getElementById("cards");
-      const index = cardsContainer.children.length + 1;
 
-      const parsed = parseSingleLine(rawText, index);
-      const name = parsed.name;
-      const purpose = parsed.purpose;
-      const io = parsed.io;
+      const blocks = splitBlocks(rawText);
+      if (blocks.length === 0) {
+        alert("내용이 없습니다. 도구 이름과 목적을 입력해 주세요.");
+        return;
+      }
 
-      const toolId = makeToolId(name, index);
+      blocks.forEach((block, i) => {
+        const index = cardsContainer.children.length + 1;
+        const parsed = parseBlock(block, index);
+        const name = parsed.name;
+        const purpose = parsed.purpose;
+        const io = parsed.io;
+        const toolId = makeToolId(name, index);
 
-      const githubUrl = githubBase
-        ? githubBase.replace(/\/+$/, "") + "/" + encodeURIComponent(toolId)
-        : "GitHub 기본 경로 미설정 (위에서 먼저 입력)";
-      const denoUrl = denoBase
-        ? denoBase.replace(/\/+$/, "") + "/" + encodeURIComponent(toolId)
-        : "Deno 기본 경로 미설정 (위에서 먼저 입력)";
+        const githubUrl = githubBase
+          ? githubBase.replace(/\/+$/, "") + "/" + encodeURIComponent(toolId)
+          : "GitHub 기본 경로 미설정 (위에서 먼저 입력)";
+        const denoUrl = denoBase
+          ? denoBase.replace(/\/+$/, "") + "/" + encodeURIComponent(toolId)
+          : "Deno 기본 경로 미설정 (위에서 먼저 입력)";
 
-      const card = document.createElement("div");
-      card.className = "card";
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <div class="card-header">
+            <div class="card-title">도구 #${index} — ${name}</div>
+            <div class="badge">세팅 카드</div>
+          </div>
+          <div>
+            <p><strong>목적:</strong><br>${purpose.replace(/\n/g, "<br>")}</p>
+            <p><strong>입력·출력:</strong> ${io}</p>
+          </div>
+          <div>
+            <label>GitHub 업로드 주소 (복사 → 주소창 붙여넣기)</label>
+            <input type="text" class="github-url" value="${githubUrl}" />
+            <label>Deno 업로드 주소 (복사 → 주소창 붙여넣기)</label>
+            <input type="text" class="deno-url" value="${denoUrl}" />
+          </div>
+          <div>
+            <label>업로드 상태</label>
+            <select class="status-select">
+              <option value="미업로드">□ 미업로드</option>
+              <option value="GitHub 완료">■ GitHub 업로드 완료</option>
+              <option value="Deno 완료">■ Deno 업로드 완료</option>
+              <option value="양쪽 완료">■ GitHub + Deno 업로드 완료</option>
+            </select>
+          </div>
+          <div>
+            <label>테스트·검증 체크리스트 (임시 공통판)</label>
+            <ul class="small">
+              <li>① 화면 뼈대: 입력창·버튼·출력 영역이 모두 보이는가?</li>
+              <li>② 필수 기능: 기본 입력 → 출력 흐름이 끊김 없이 동작하는가?</li>
+              <li>③ 오류 처리: 잘못된 입력을 넣었을 때도 화면이 깨지지 않는가?</li>
+              <li>④ 엣지 케이스: 빈 값·긴 텍스트 등에서도 흐름이 유지되는가?</li>
+              <li>⑤ 정리본: 도구 이름·상태·주소가 요약에 잘 반영되는가?</li>
+            </ul>
+          </div>
+        `;
+        const statusSelect = card.querySelector(".status-select");
+        statusSelect.addEventListener("change", updateSummary);
+        cardsContainer.appendChild(card);
+      });
 
-      card.innerHTML = `
-        <div class="card-header">
-          <div class="card-title">도구 #${index} — ${name}</div>
-          <div class="badge">세팅 카드</div>
-        </div>
-        <div>
-          <p><strong>목적:</strong><br>${purpose.replace(/\n/g, "<br>")}</p>
-          <p><strong>입력·출력:</strong> ${io}</p>
-        </div>
-        <div>
-          <label>GitHub 업로드 주소 (복사 → 주소창에 붙여넣기)</label>
-          <input type="text" class="github-url" value="${githubUrl}" />
-          <label>Deno 업로드 주소 (복사 → 주소창에 붙여넣기)</label>
-          <input type="text" class="deno-url" value="${denoUrl}" />
-        </div>
-        <div>
-          <label>업로드 상태</label>
-          <select class="status-select">
-            <option value="미업로드">□ 미업로드</option>
-            <option value="GitHub 완료">■ GitHub 업로드 완료</option>
-            <option value="Deno 완료">■ Deno 업로드 완료</option>
-            <option value="양쪽 완료">■ GitHub + Deno 업로드 완료</option>
-          </select>
-        </div>
-        <div>
-          <label>테스트·검증 체크리스트 (임시 공통판, 나중에 분리 가능)</label>
-          <ul class="small">
-            <li>① 화면 뼈대: 입력창·버튼·출력 영역이 모두 보이는가?</li>
-            <li>② 필수 기능: 기본 입력 → 출력 흐름이 끊김 없이 동작하는가?</li>
-            <li>③ 오류 처리: 잘못된 입력을 넣었을 때도 화면이 깨지지 않는가?</li>
-            <li>④ 엣지 케이스: 빈 값·긴 텍스트 등에서도 흐름이 유지되는가?</li>
-            <li>⑤ 정리본: 도구 이름·상태·주소가 요약에 잘 반영되는가?</li>
-          </ul>
-        </div>
-      `;
-
-      const statusSelect = card.querySelector(".status-select");
-      statusSelect.addEventListener("change", updateSummary);
-
-      cardsContainer.appendChild(card);
       document.getElementById("singleLine").value = "";
       updateSummary();
     }
 
-    // ================================
-    // Ⅳ. 정리본 갱신
-    // ================================
     function updateSummary() {
       const cardsContainer = document.getElementById("cards");
       const summaryLines = [];
