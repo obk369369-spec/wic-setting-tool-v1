@@ -2,45 +2,53 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>WIC 7번 세팅 도구 — 도구 카드 관리</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WIC 7번 세팅 도구 – 도구 카드 관리</title>
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
     body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
       margin: 0;
-      padding: 16px;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f5f5f5;
+      padding: 24px;
+      background: #f5f5f7;
       color: #222;
+      line-height: 1.5;
     }
     h1 {
-      font-size: 20px;
-      margin-bottom: 4px;
+      font-size: 22px;
+      margin-bottom: 8px;
     }
-    .sub {
-      font-size: 13px;
-      color: #555;
-      margin-bottom: 16px;
+    h2 {
+      font-size: 18px;
+      margin: 16px 0 8px;
     }
     .section {
-      background: #fff;
-      padding: 12px 14px;
-      border-radius: 8px;
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin-bottom: 16px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-      margin-bottom: 12px;
     }
     .section-title {
-      font-weight: 700;
-      margin-bottom: 8px;
-      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .section-desc {
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 10px;
     }
     label {
       font-size: 13px;
       font-weight: 600;
       display: block;
+      margin-top: 8px;
       margin-bottom: 4px;
     }
-    input[type="text"], textarea {
+    input[type="text"],
+    textarea {
       width: 100%;
       padding: 8px 10px;
       border-radius: 6px;
@@ -49,7 +57,8 @@
       resize: vertical;
     }
     textarea {
-      min-height: 120px;
+      min-height: 100px;
+      font-family: inherit;
       white-space: pre-wrap;
     }
     .hint {
@@ -57,39 +66,45 @@
       color: #777;
       margin-top: 4px;
     }
-    button {
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       padding: 8px 14px;
-      border-radius: 6px;
+      border-radius: 8px;
       border: none;
+      margin-top: 10px;
       font-size: 13px;
+      font-weight: 600;
       cursor: pointer;
       background: #2563eb;
-      color: #fff;
+      color: white;
     }
-    button:disabled {
-      opacity: 0.6;
+    .btn:disabled {
+      opacity: 0.5;
       cursor: default;
     }
-    .cards-container {
+    .cards-grid {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      margin-top: 6px;
+      gap: 10px;
+      margin-top: 8px;
     }
     .card {
       background: #fafafa;
       border-radius: 8px;
       border: 1px solid #e1e1e1;
-      padding: 10px 12px;
+      padding: 12px 14px;
     }
     .card-header {
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
       margin-bottom: 6px;
+      gap: 6px;
     }
     .card-title {
-      font-weight: 700;
+      font-weight: 600;
       font-size: 14px;
     }
     .badge {
@@ -97,362 +112,385 @@
       padding: 2px 6px;
       border-radius: 999px;
       background: #eef2ff;
-      border: 1px solid #c7d2fe;
       color: #3730a3;
       white-space: nowrap;
     }
     .card-body p {
       margin: 2px 0;
-      font-size: 12px;
+      font-size: 13px;
     }
-    .url-box {
+    .url-input {
       margin-top: 4px;
+    }
+    .url-input input {
+      width: 100%;
+      font-size: 12px;
     }
     .url-label {
       font-size: 12px;
-      font-weight: 600;
-      margin-bottom: 2px;
-    }
-    .url-text {
-      font-size: 12px;
-      background: #fff;
-      border-radius: 4px;
-      border: 1px solid #ddd;
-      padding: 4px 6px;
-      word-break: break-all;
-    }
-    .status-row {
-      margin-top: 4px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
+      margin-top: 6px;
     }
     .checklist {
-      margin-top: 4px;
+      margin-top: 6px;
       font-size: 12px;
-    }
-    .checklist ul {
+      color: #555;
       padding-left: 18px;
-      margin: 2px 0;
     }
-    .summary-box {
+    .checklist li {
+      margin-bottom: 2px;
+    }
+    .summary-textarea {
+      min-height: 80px;
       font-size: 12px;
-      background: #fff;
-      border-radius: 8px;
-      border: 1px solid #e1e1e1;
-      padding: 10px 12px;
-      white-space: pre-wrap;
+    }
+    .inline-note {
+      font-size: 12px;
+      color: #555;
+      margin-top: 6px;
+    }
+    .small {
+      font-size: 12px;
     }
   </style>
 </head>
 <body>
   <h1>WIC 7번 세팅 도구 — 도구 카드 관리</h1>
-  <div class="sub">
-    이 도구는 WIC 각 도구의 세팅 뼈대를 만들고, GitHub/Deno 업로드 주소를 자동으로 만들어 주는 화면형 세팅 도구다.
-    화면에 보이는 입력만으로 카드·주소·정리본을 관리한다.
+  <div class="section">
+    <div class="section-desc">
+      이 도구는 WIC 각 도구의 세팅 뼈대를 만들고, GitHub/Deno 업로드 주소를 자동으로 만들기 위한 화면형 세팅 도구이다.
+      도구 한 줄 지시만 넣으면 도구 카드와 업로드용 주소 텍스트가 자동으로 생성된다.
+    </div>
   </div>
 
   <!-- 1. 업로드 환경 설정 -->
   <div class="section">
     <div class="section-title">① 업로드 환경 설정 (한 번만 입력)</div>
+    <div class="section-desc">
+      한 번 입력하면, 아래에서 만드는 모든 도구 카드가 이 값을 이용해 GitHub/Deno 업로드 주소를 자동 생성한다.
+    </div>
     <label for="github-base">GitHub 업로드 기본 경로</label>
     <input
+      type="text"
       id="github-base"
-      type="text"
-      placeholder="예: https://github.com/USER"
+      value="https://github.com/obk369369-spec"
     />
-    <div class="hint">예: https://github.com/obk369369-spec</div>
+    <div class="hint small">예: https://github.com/obk369369-spec</div>
 
-    <label for="deno-base" style="margin-top:8px;">Deno 프로젝트 기본 경로</label>
+    <label for="deno-base" style="margin-top:10px;">Deno 프로젝트 기본 경로</label>
     <input
-      id="deno-base"
       type="text"
-      placeholder="예: https://dash.deno.com/projects"
+      id="deno-base"
+      value="https://dash.deno.com/projects"
     />
-    <div class="hint">예: https://dash.deno.com/projects</div>
-    <div class="hint">위 두 줄은 전체 공통값이다. 한 번 입력해 두면 아래에서 만드는 모든 도구 카드가 이 값을 이용해 업로드용 주소 텍스트를 자동 생성한다.</div>
+    <div class="hint small">예: https://dash.deno.com/projects</div>
   </div>
 
   <!-- 2. 한 줄 지시로 도구 카드 생성 -->
   <div class="section">
     <div class="section-title">② 한 줄 지시로 도구 카드 생성</div>
-    <label for="tools-input">도구 한 줄 지시</label>
-    <textarea
-      id="tools-input"
-      placeholder="형식: 도구 이름 / (같은 줄에 목적 첫 문장)\n그 아래 줄에는 목적 추가 설명을 여러 줄로 적을 수 있습니다.\n도구 블록과 블록 사이에 빈 줄을 한 칸 넣으면 새 도구로 인식합니다.\n\n예)\n1번 자동 안내서 도구 / 온라인·오프라인 고객에게 안내서를 자동으로 보내고 후속 연락까지 도와주는 도구이다.\n입찰 안내 메일에 같이 넣을 문장도 이 도구에서 함께 만든다.\n\n2번 입찰 감시 도구 / 나라장터와 KISTI 입찰 공고를 살펴보고, 중요한 공고를 빠르게 찾는 도구이다.">
-    </textarea>
-    <div class="hint">
-      ● 한 블록 = “도구 이름 / 목적 첫 줄” + 목적 추가 줄들<br />
-      ● 블록과 블록 사이를 “빈 줄 1칸 이상”으로 구분하면, 각 블록이 하나의 도구 카드로 생성된다.<br />
-      ● 도구 이름에 <code>tool8-verb-helper</code> 같이 슬러그가 포함되어 있으면 그 값을 그대로 주소에 사용한다.
+    <div class="section-desc">
+      각 줄당 “번호 + 도구 이름 / 목적 설명” 형식으로 작성한다.
+      1번~10번까지 한꺼번에 붙여 넣어도 되고, 나중에 줄을 추가해서 다시 생성해도 된다.
     </div>
-    <button id="generate-btn" style="margin-top:8px;">도구 카드 생성</button>
+
+    <label for="tool-lines">도구 한 줄 지시 (여러 줄 붙여넣기 가능)</label>
+    <textarea id="tool-lines" placeholder="예)
+1번 자동 안내서 도구 / 온라인·오프라인 고객에게 안내서를 자동으로 보내고 후속 연락까지 도와주는 도구이다.
+
+2번 입찰 감시 도구 / 나라장터와 KISTI 입찰 공고를 살펴보고 중요한 공고를 빠르게 찾는 도구이다.
+
+3번 입찰 서류 정리 도구 / 입찰에 필요한 제안서·서류를 자동 정리하고 한 번에 관리하는 도구이다.
+
+…"></textarea>
+
+    <div class="hint">
+      • 형식: <strong>번호 + ‘번’ + 도구 이름 / 목적 설명</strong>  
+      • 목적 부분은 두 줄까지 이어서 써도 된다(중간 줄바꿈은 자동으로 합쳐서 인식).  
+      • 빈 줄(공백 줄)이 있으면 그 줄을 기준으로 도구 블록이 나뉜다.
+    </div>
+
+    <button class="btn" id="generate-btn">도구 카드 생성</button>
+    <div class="inline-note">
+      ※ 사용자는 가능한 한 번만 붙여넣고 버튼을 누른다. 나머지(도구 카드, 링크, 상태표시, 정리본)는 세팅 도구가 자동으로 만든다.
+    </div>
   </div>
 
   <!-- 3. 도구 카드 목록 -->
   <div class="section">
     <div class="section-title">③ 도구 카드 목록</div>
-    <div id="cards" class="cards-container"></div>
+    <div class="section-desc">
+      아래에는 생성된 도구 카드들이 번호 순서대로 쌓인다. 각 카드에는 이름·목적·GitHub/Deno 업로드 주소·업로드 상태·테스트 체크리스트가 포함된다.
+      주소 칸은 클릭하면 전체 선택되므로 그대로 복사해서 브라우저 주소창에 붙여넣으면 된다.
+    </div>
+    <div id="cards-container" class="cards-grid"></div>
   </div>
 
   <!-- 4. 정리본 -->
   <div class="section">
     <div class="section-title">④ 정리본 (도구 목록·업로드 상태 요약)</div>
-    <div id="summary" class="summary-box">
-[WIC 7번 세팅 도구 — 도구 목록 요약]
-카드를 만들면 여기 정리본이 자동 갱신된다.
+    <div class="section-desc">
+      이 텍스트는 Word/TXT/GitHub README 등에 복사하여 “어떤 도구가 어디까지 올라갔는지” 기록용으로 사용한다.
     </div>
-    <div class="hint" style="margin-top:4px;">
-      이 텍스트는 Word/TXT/GitHub README 등에 복사해서
-      “어떤 도구가 어디까지 올라갔는지” 기록용으로 사용한다.
-    </div>
+    <textarea id="summary" class="summary-textarea" readonly></textarea>
   </div>
 
   <script>
-    const githubBaseInput = document.getElementById("github-base");
-    const denoBaseInput = document.getElementById("deno-base");
-    const toolsInput = document.getElementById("tools-input");
+    // 번호별 고정 도구 ID 표
+    const TOOL_ID_MAP = {
+      1: "tool1-auto-guide",
+      2: "tool2-bid-watcher",
+      3: "tool3-report-sender",
+      4: "tool4-research-excel",
+      5: "tool5-report-maker",
+      6: "tool6-status-viewer",
+      7: "tool7-setting-tool",
+      8: "tool8-verb-helper",
+      9: "tool9-content-guide",
+      10: "tool10-finance-book"
+    };
+
+    const toolLinesEl = document.getElementById("tool-lines");
+    const githubBaseEl = document.getElementById("github-base");
+    const denoBaseEl = document.getElementById("deno-base");
+    const cardsContainer = document.getElementById("cards-container");
+    const summaryEl = document.getElementById("summary");
     const generateBtn = document.getElementById("generate-btn");
-    const cardsContainer = document.getElementById("cards");
-    const summaryBox = document.getElementById("summary");
 
-    function makeSlug(name, index) {
-      if (!name) return "tool" + index;
-      // toolXXX 가 이미 들어 있으면 그걸 사용
-      const toolMatch = name.match(/(tool[\w-]+)/i);
-      if (toolMatch) return toolMatch[1].toLowerCase();
-
-      // 한국어 이름 등에서 slug 생성
-      const base = name
-        .normalize("NFKD")
-        .replace(/[^\w\s-]/g, "")
-        .trim()
-        .replace(/\s+/g, "-")
-        .toLowerCase();
-
-      if (!base) return "tool" + index;
-      if (base.startsWith("tool")) return base;
-      return "tool" + index + "-" + base;
+    function normalizeBaseUrl(url) {
+      const trimmed = url.trim();
+      if (!trimmed) return "";
+      return trimmed.replace(/\/+$/, "");
     }
 
-    function buildGithubUrl(base, slug) {
-      if (!base || !base.trim()) {
-        return "GitHub 경로 미설정 (위에서 기본 경로를 먼저 입력)";
-      }
-      const trimmed = base.replace(/\/+$/, "");
-      return trimmed + "/" + slug + ".html";
-    }
+    // 도구 한 줄 지시 전체를 파싱해서 도구 객체 배열로 변환
+    function parseToolBlocks(rawText, githubBase, denoBase) {
+      const normGit = normalizeBaseUrl(githubBase);
+      const normDeno = normalizeBaseUrl(denoBase);
 
-    function buildDenoUrl(base, slug) {
-      if (!base || !base.trim()) {
-        return "Deno 경로 미설정 (위에서 기본 경로를 먼저 입력)";
-      }
-      const trimmed = base.replace(/\/+$/, "");
-      if (trimmed.includes("?")) {
-        return trimmed + "&tool=" + slug;
-      }
-      // 미스터 오가 요청한 것처럼, 사용자는 이 텍스트만 복사해서 주소창에 붙여넣는다.
-      return trimmed + "?tool=" + slug;
-    }
+      // 빈 줄 기준으로 블록 나누기
+      const blocks = rawText
+        .split(/\n\s*\n+/)
+        .map(b => b.trim())
+        .filter(b => b.length > 0);
 
-    function parseBlocks(text) {
-      const lines = text.split(/\r?\n/);
-      const blocks = [];
-      let current = [];
-
-      for (const rawLine of lines) {
-        const line = rawLine.trimEnd();
-        if (line.trim() === "") {
-          if (current.length > 0) {
-            blocks.push(current);
-            current = [];
-          }
-        } else {
-          current.push(line);
-        }
-      }
-      if (current.length > 0) {
-        blocks.push(current);
-      }
-      return blocks;
-    }
-
-    function parseTools(text) {
-      const blocks = parseBlocks(text);
       const tools = [];
 
-      blocks.forEach((block, idx) => {
-        if (block.length === 0) return;
+      blocks.forEach(block => {
+        // 줄바꿈을 공백 하나로 합치기
+        const oneLine = block.replace(/\s*\n\s*/g, " ").trim();
+        if (!oneLine) return;
 
-        const firstLine = block[0];
-        const restLines = block.slice(1);
-
-        let namePart = firstLine;
-        let purposeFirst = "";
-        if (firstLine.includes("/")) {
-          const split = firstLine.split("/", 2);
-          namePart = split[0];
-          purposeFirst = split[1] || "";
+        // 첫 번째 '/' 기준으로 왼쪽(제목), 오른쪽(목적) 분리
+        const slashIndex = oneLine.indexOf("/");
+        let left, purposePart;
+        if (slashIndex === -1) {
+          left = oneLine;
+          purposePart = "";
+        } else {
+          left = oneLine.slice(0, slashIndex).trim();
+          purposePart = oneLine.slice(slashIndex + 1).trim();
         }
 
-        const name = (namePart || "").trim();
-        const purposeLines = [];
-        if (purposeFirst && purposeFirst.trim()) {
-          purposeLines.push(purposeFirst.trim());
-        }
-        restLines.forEach((l) => {
-          if (l && l.trim()) {
-            purposeLines.push(l.trim());
-          }
-        });
+        // "1번 자동 안내서 도구" 같은 형식에서 번호와 이름 추출
+        const m = left.match(/^(\d+)\s*번\s*(.+)$/);
+        const num = m ? Number(m[1]) : null;
+        const name = (m ? m[2] : left).trim();
 
-        const purpose = purposeLines.join("\n");
-        const slug = makeSlug(name, idx + 1);
+        const toolId =
+          (num && TOOL_ID_MAP[num]) ||
+          (num ? "tool" + num : name.replace(/\s+/g, "-"));
+
+        const githubUrl = normGit
+          ? normGit + "/" + toolId + ".html"
+          : "GitHub 경로 미설정 (위에서 기본 경로를 먼저 입력)";
+        const denoUrl = normDeno
+          ? normDeno + "?tool=" + toolId
+          : "Deno 경로 미설정 (위에서 기본 경로를 먼저 입력)";
+
+        const purpose = purposePart;
 
         tools.push({
-          index: idx + 1,
-          name: name || "이름 미입력 도구 #" + (idx + 1),
-          purpose: purpose || "도구 목적 미입력",
-          slug,
+          num,
+          name,
+          purpose,
+          toolId,
+          githubUrl,
+          denoUrl
         });
+      });
+
+      // 번호가 있는 경우 번호 기준 정렬
+      tools.sort((a, b) => {
+        if (a.num != null && b.num != null) return a.num - b.num;
+        if (a.num != null) return -1;
+        if (b.num != null) return 1;
+        return 0;
       });
 
       return tools;
     }
 
-    function renderCards(tools) {
-      cardsContainer.innerHTML = "";
+    function createCard(tool) {
+      const card = document.createElement("div");
+      card.className = "card";
 
-      const githubBase = githubBaseInput.value.trim();
-      const denoBase = denoBaseInput.value.trim();
+      const header = document.createElement("div");
+      header.className = "card-header";
 
-      const summaryLines = [];
-      summaryLines.push("[WIC 7번 세팅 도구 — 도구 목록 요약]");
-      summaryLines.push("GitHub 기본 경로: " + (githubBase || "미설정"));
-      summaryLines.push("Deno 기본 경로: " + (denoBase || "미설정"));
-      summaryLines.push("");
+      const title = document.createElement("div");
+      title.className = "card-title";
+      const numLabel = tool.num != null ? "도구 #" + tool.num + " — " : "";
+      title.textContent = numLabel + tool.name;
 
-      tools.forEach((tool) => {
-        const githubUrl = buildGithubUrl(githubBase, tool.slug);
-        const denoUrl = buildDenoUrl(denoBase, tool.slug);
+      const badge = document.createElement("div");
+      badge.className = "badge";
+      badge.textContent = "세팅 카드";
 
-        // 카드 DOM
-        const card = document.createElement("div");
-        card.className = "card";
+      header.appendChild(title);
+      header.appendChild(badge);
 
-        const header = document.createElement("div");
-        header.className = "card-header";
+      const body = document.createElement("div");
+      body.className = "card-body";
 
-        const title = document.createElement("div");
-        title.className = "card-title";
-        title.textContent = `도구 #${tool.index} — ${tool.name}`;
+      const pPurpose = document.createElement("p");
+      pPurpose.innerHTML =
+        "<strong>목적:</strong> " +
+        (tool.purpose || "도구 목적 미입력(필요 시 수정)");
 
-        const badge = document.createElement("span");
-        badge.className = "badge";
-        badge.textContent = "세팅 카드";
+      const pIo = document.createElement("p");
+      pIo.innerHTML =
+        "<strong>입력·출력:</strong> 입력·출력 미입력(필요 시 수정)";
 
-        header.appendChild(title);
-        header.appendChild(badge);
+      body.appendChild(pPurpose);
+      body.appendChild(pIo);
 
-        const body = document.createElement("div");
-        body.className = "card-body";
+      // GitHub URL
+      const ghLabel = document.createElement("div");
+      ghLabel.className = "url-label";
+      ghLabel.textContent = "GitHub 업로드 주소";
 
-        const purposeP = document.createElement("p");
-        purposeP.innerHTML = `<strong>목적:</strong><br>${tool.purpose
-          .split("\n")
-          .map((l) => l || "&nbsp;")
-          .join("<br>")}`;
+      const ghInputWrap = document.createElement("div");
+      ghInputWrap.className = "url-input";
+      const ghInput = document.createElement("input");
+      ghInput.type = "text";
+      ghInput.value = tool.githubUrl;
+      ghInput.readOnly = true;
+      ghInput.className = "url-field";
+      ghInputWrap.appendChild(ghInput);
 
-        const ioP = document.createElement("p");
-        ioP.innerHTML =
-          '<strong>입력·출력:</strong> 입력·출력 미입력(필요 시 수정)';
+      // Deno URL
+      const denoLabel = document.createElement("div");
+      denoLabel.className = "url-label";
+      denoLabel.textContent = "Deno 업로드 주소";
 
-        body.appendChild(purposeP);
-        body.appendChild(ioP);
+      const denoInputWrap = document.createElement("div");
+      denoInputWrap.className = "url-input";
+      const denoInput = document.createElement("input");
+      denoInput.type = "text";
+      denoInput.value = tool.denoUrl;
+      denoInput.readOnly = true;
+      denoInput.className = "url-field";
+      denoInputWrap.appendChild(denoInput);
 
-        // URL 영역
-        const githubBox = document.createElement("div");
-        githubBox.className = "url-box";
-        const ghLabel = document.createElement("div");
-        ghLabel.className = "url-label";
-        ghLabel.textContent = "GitHub 업로드 주소";
-        const ghText = document.createElement("div");
-        ghText.className = "url-text";
-        ghText.textContent = githubUrl;
+      const uploadState = document.createElement("div");
+      uploadState.style.marginTop = "6px";
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.id = "upload-" + (tool.toolId || "");
+      const cbLabel = document.createElement("label");
+      cbLabel.htmlFor = checkbox.id;
+      cbLabel.style.display = "inline";
+      cbLabel.style.marginLeft = "4px";
+      cbLabel.style.fontSize = "12px";
+      cbLabel.textContent = "미업로드";
+      uploadState.appendChild(checkbox);
+      uploadState.appendChild(cbLabel);
 
-        githubBox.appendChild(ghLabel);
-        githubBox.appendChild(ghText);
+      const checklistTitle = document.createElement("div");
+      checklistTitle.className = "url-label";
+      checklistTitle.textContent = "테스트·검증 체크리스트";
 
-        const denoBox = document.createElement("div");
-        denoBox.className = "url-box";
-        const dLabel = document.createElement("div");
-        dLabel.className = "url-label";
-        dLabel.textContent = "Deno 업로드 주소";
-        const dText = document.createElement("div");
-        dText.className = "url-text";
-        dText.textContent = denoUrl;
-
-        denoBox.appendChild(dLabel);
-        denoBox.appendChild(dText);
-
-        const statusRow = document.createElement("div");
-        statusRow.className = "status-row";
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.id = `upload-${tool.index}`;
-        const label = document.createElement("label");
-        label.htmlFor = checkbox.id;
-        label.textContent = "미업로드";
-        statusRow.appendChild(checkbox);
-        statusRow.appendChild(label);
-
-        const checklist = document.createElement("div");
-        checklist.className = "checklist";
-        checklist.innerHTML = `
-          <div><strong>테스트·검증 체크리스트</strong></div>
-          <ul>
-            <li>화면 뼈대: 입력창·버튼·출력 영역이 모두 보이는가?</li>
-            <li>필수 기능: 기본 입력 → 출력 흐름이 끊김 없이 동작하는가?</li>
-            <li>오류 처리: 잘못된 입력을 넣었을 때도 화면이 깨지지 않는가?</li>
-            <li>엣지 케이스: 빈 값·긴 텍스트 등에서도 흐름이 유지되는가?</li>
-            <li>정리본: 도구 이름·상태·주소가 요약에 잘 반영되는가?</li>
-          </ul>
-        `;
-
-        card.appendChild(header);
-        card.appendChild(body);
-        card.appendChild(githubBox);
-        card.appendChild(denoBox);
-        card.appendChild(statusRow);
-        card.appendChild(checklist);
-
-        cardsContainer.appendChild(card);
-
-        // 정리본용 텍스트
-        summaryLines.push(
-          `도구 #${tool.index} — ${tool.name}\n목적: ${tool.purpose.replace(
-            /\n/g,
-            " "
-          )}\nGitHub: ${githubUrl}\nDeno: ${denoUrl}\n`
-        );
+      const ul = document.createElement("ul");
+      ul.className = "checklist";
+      const items = [
+        "화면 뼈대: 입력창·버튼·출력 영역이 모두 보이는가?",
+        "필수 기능: 기본 입력 → 출력 흐름이 끊김 없이 동작하는가?",
+        "오류 처리: 잘못된 입력을 넣었을 때도 화면이 깨지지 않는가?",
+        "엣지 케이스: 빈 값·긴 텍스트 등에서도 흐름이 유지되는가?",
+        "정리본: 도구 이름·상태·주소가 요약에 잘 반영되는가?"
+      ];
+      items.forEach(text => {
+        const li = document.createElement("li");
+        li.textContent = text;
+        ul.appendChild(li);
       });
 
-      if (tools.length === 0) {
-        summaryLines.push("(생성된 도구 카드가 없습니다.)");
-      }
+      body.appendChild(ghLabel);
+      body.appendChild(ghInputWrap);
+      body.appendChild(denoLabel);
+      body.appendChild(denoInputWrap);
+      body.appendChild(uploadState);
+      body.appendChild(checklistTitle);
+      body.appendChild(ul);
 
-      summaryBox.textContent = summaryLines.join("\n");
+      card.appendChild(header);
+      card.appendChild(body);
+
+      // URL 필드 클릭 시 전체 선택
+      const urlFields = card.querySelectorAll(".url-field");
+      urlFields.forEach(input => {
+        input.addEventListener("focus", () => input.select());
+        input.addEventListener("click", () => input.select());
+      });
+
+      return card;
     }
 
-    generateBtn.addEventListener("click", () => {
-      const text = toolsInput.value || "";
-      const tools = parseTools(text);
-      renderCards(tools);
-    });
+    function updateSummary(tools) {
+      if (!tools.length) {
+        summaryEl.value = "";
+        return;
+      }
+      const ghBase = normalizeBaseUrl(githubBaseEl.value || "");
+      const denoBase = normalizeBaseUrl(denoBaseEl.value || "");
+      let lines = [];
+      lines.push("[WIC 7번 세팅 도구 — 도구 목록 요약]");
+      lines.push("GitHub 기본 경로: " + (ghBase || "미설정"));
+      lines.push("Deno 기본 경로: " + (denoBase || "미설정"));
+      lines.push("");
+      tools.forEach(t => {
+        const numLabel = t.num != null ? t.num + "번 " : "";
+        lines.push(
+          numLabel +
+            t.name +
+            " — " +
+            (t.purpose || "도구 목적 미입력(필요 시 수정)")
+        );
+        lines.push("  · GitHub: " + t.githubUrl);
+        lines.push("  · Deno : " + t.denoUrl);
+        lines.push("");
+      });
+      summaryEl.value = lines.join("\n");
+    }
 
-    // 초기 상태에서는 카드 없음
-    renderCards([]);
+    function generateCards() {
+      const rawText = toolLinesEl.value || "";
+      const ghBase = githubBaseEl.value || "";
+      const denoBase = denoBaseEl.value || "";
+
+      const tools = parseToolBlocks(rawText, ghBase, denoBase);
+
+      cardsContainer.innerHTML = "";
+
+      tools.forEach(tool => {
+        const card = createCard(tool);
+        cardsContainer.appendChild(card);
+      });
+
+      updateSummary(tools);
+    }
+
+    generateBtn.addEventListener("click", generateCards);
   </script>
 </body>
 </html>
