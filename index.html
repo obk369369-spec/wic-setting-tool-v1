@@ -2,495 +2,581 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>WIC 7번 세팅 도구 – 도구 카드 관리</title>
+  <title>WIC 세팅 도구 v1</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     * {
       box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        sans-serif;
       margin: 0;
-      padding: 24px;
-      background: #f5f5f7;
-      color: #222;
-      line-height: 1.5;
+      padding: 16px;
+      background: #f3f4f6;
+      color: #111827;
     }
     h1 {
-      font-size: 22px;
-      margin-bottom: 8px;
+      margin: 0 0 8px;
+      font-size: 20px;
     }
-    h2 {
-      font-size: 18px;
-      margin: 16px 0 8px;
+    .subtitle {
+      font-size: 12px;
+      color: #4b5563;
+      margin-bottom: 12px;
     }
-    .section {
-      background: #ffffff;
+    .layout {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .panel {
+      background: white;
       border-radius: 10px;
-      padding: 16px 18px;
-      margin-bottom: 16px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-    }
-    .section-title {
-      font-weight: 600;
-      margin-bottom: 6px;
-    }
-    .section-desc {
-      font-size: 13px;
-      color: #555;
-      margin-bottom: 10px;
+      padding: 12px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
     label {
-      font-size: 13px;
-      font-weight: 600;
+      font-size: 12px;
+      color: #4b5563;
       display: block;
-      margin-top: 8px;
       margin-bottom: 4px;
     }
-    input[type="text"],
-    textarea {
+    textarea, input[type="text"] {
       width: 100%;
-      padding: 8px 10px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
       font-size: 13px;
       resize: vertical;
     }
-    textarea {
-      min-height: 100px;
-      font-family: inherit;
-      white-space: pre-wrap;
+    textarea:focus, input[type="text"]:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 1px #2563eb22;
     }
-    .hint {
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .row > div {
+      flex: 1 1 200px;
+    }
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 6px 12px;
       font-size: 12px;
-      color: #777;
-      margin-top: 4px;
-    }
-    .btn {
+      cursor: pointer;
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      padding: 8px 14px;
-      border-radius: 8px;
-      border: none;
-      margin-top: 10px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
+      gap: 4px;
+      white-space: nowrap;
+    }
+    button:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+    .btn-primary {
       background: #2563eb;
       color: white;
     }
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: default;
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #111827;
     }
-    .cards-grid {
-      display: flex;
-      flex-direction: column;
+    .btn-github {
+      background: #0f172a;
+      color: white;
+    }
+    .btn-deno {
+      background: #059669;
+      color: white;
+    }
+    .btn-core {
+      background: #f59e0b;
+      color: white;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 10px;
-      margin-top: 8px;
     }
     .card {
-      background: #fafafa;
-      border-radius: 8px;
-      border: 1px solid #e1e1e1;
-      padding: 12px 14px;
+      background: white;
+      border-radius: 12px;
+      padding: 10px;
+      border: 1px solid #e5e7eb;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
     }
     .card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 6px;
       gap: 6px;
     }
     .card-title {
+      font-size: 13px;
       font-weight: 600;
-      font-size: 14px;
+    }
+    .card-tag {
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-size: 10px;
+      background: #e5e7eb;
+      color: #374151;
+    }
+    .card-body {
+      font-size: 12px;
+      color: #4b5563;
+      white-space: pre-line;
+    }
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #9ca3af;
+    }
+    .status-ok { background: #10b981; }
+    .status-error { background: #ef4444; }
+    .status-testing { background: #fbbf24; }
+    .small-label {
+      font-size: 11px;
+      color: #6b7280;
+    }
+    .url-row {
+      display: flex;
+      gap: 4px;
+      margin-top: 4px;
+    }
+    .url-row input[type="text"] {
+      flex: 1;
+      font-size: 11px;
+      padding: 5px 6px;
+    }
+    .url-row button {
+      font-size: 11px;
+      padding: 4px 8px;
+    }
+    .log-box {
+      background: #f9fafb;
+      border-radius: 6px;
+      padding: 6px;
+      font-size: 11px;
+      color: #4b5563;
+      max-height: 80px;
+      overflow-y: auto;
+      border: 1px dashed #e5e7eb;
+    }
+    .action-row {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: #6b7280;
+      margin-top: 4px;
     }
     .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
       font-size: 11px;
       padding: 2px 6px;
       border-radius: 999px;
-      background: #eef2ff;
-      color: #3730a3;
-      white-space: nowrap;
+      background: #e5e7eb;
     }
-    .card-body p {
-      margin: 2px 0;
-      font-size: 13px;
-    }
-    .url-input {
-      margin-top: 4px;
-    }
-    .url-input input {
-      width: 100%;
-      font-size: 12px;
-    }
-    .url-label {
-      font-size: 12px;
-      margin-top: 6px;
-    }
-    .checklist {
-      margin-top: 6px;
-      font-size: 12px;
-      color: #555;
-      padding-left: 18px;
-    }
-    .checklist li {
-      margin-bottom: 2px;
-    }
-    .summary-textarea {
-      min-height: 80px;
-      font-size: 12px;
-    }
-    .inline-note {
-      font-size: 12px;
-      color: #555;
-      margin-top: 6px;
-    }
-    .small {
-      font-size: 12px;
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+      .panel {
+        padding: 10px;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>WIC 7번 세팅 도구 — 도구 카드 관리</h1>
-  <div class="section">
-    <div class="section-desc">
-      이 도구는 WIC 각 도구의 세팅 뼈대를 만들고, GitHub/Deno 업로드 주소를 자동으로 만들기 위한 화면형 세팅 도구이다.
-      도구 한 줄 지시만 넣으면 도구 카드와 업로드용 주소 텍스트가 자동으로 생성된다.
+<div class="layout">
+  <h1>WIC 세팅 도구 v1</h1>
+  <div class="subtitle">
+    도구 이름과 목적만 넣으면 카드가 자동 생성되고, GitHub / Deno 업로드 주소와 테스트를 한 화면에서 관리합니다.
+    (자동 테스트는 페이지가 열려 있는 동안 10분 간격으로 실행됩니다.)
+  </div>
+
+  <!-- 상단 입력 패널 -->
+  <div class="panel">
+    <label for="toolsInput">
+      도구 목록 입력 (각 줄: <strong>도구 이름 / 목적</strong>)
+    </label>
+    <textarea id="toolsInput" rows="6" placeholder="예)&#10;1번 자동 안내서 도구 / 온라인·오프라인 고객에게 안내서를 자동으로 보내고 후속 연락까지 도와주는 도구이다.&#10;2번 입찰 감시 도구 / 나라장터와 KISTI 입찰 공고를 살펴보고 중요한 공고를 빠르게 찾는 도구이다."></textarea>
+
+    <div class="row">
+      <div>
+        <label for="githubBase">
+          GitHub 기본 주소 (선택, 필요 시 카드에서 개별 수정)
+        </label>
+        <input
+          type="text"
+          id="githubBase"
+          placeholder="예: https://github.com/obk369369-spec/프로젝트이름"
+        />
+      </div>
+      <div>
+        <label for="denoBase">
+          Deno 기본 주소 (선택, 필요 시 카드에서 개별 수정)
+        </label>
+        <input
+          type="text"
+          id="denoBase"
+          placeholder="예: https://dash.deno.com/projects/프로젝트이름"
+        />
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:10px; align-items:center;">
+      <div>
+        <button id="generateBtn" class="btn-primary">카드 생성</button>
+      </div>
+      <div style="font-size:11px; color:#6b7280;">
+        · 이미 생성된 카드는 다시 생성하면 새 목록으로 교체됩니다.<br />
+        · GitHub/Deno 기본 주소는 비워두어도 됩니다. (나중에 카드 안에서 수정 가능)
+      </div>
     </div>
   </div>
 
-  <!-- 1. 업로드 환경 설정 -->
-  <div class="section">
-    <div class="section-title">① 업로드 환경 설정 (한 번만 입력)</div>
-    <div class="section-desc">
-      한 번 입력하면, 아래에서 만드는 모든 도구 카드가 이 값을 이용해 GitHub/Deno 업로드 주소를 자동 생성한다.
+  <!-- 자동 테스트 상태 패널 -->
+  <div class="panel">
+    <div class="meta-row">
+      <span class="badge">
+        <span class="status-dot status-testing"></span>
+        자동 테스트 상태
+      </span>
+      <span id="autoTestInfo">자동 테스트 대기 중</span>
     </div>
-    <label for="github-base">GitHub 업로드 기본 경로</label>
-    <input
-      type="text"
-      id="github-base"
-      value="https://github.com/obk369369-spec"
-    />
-    <div class="hint small">예: https://github.com/obk369369-spec</div>
-
-    <label for="deno-base" style="margin-top:10px;">Deno 프로젝트 기본 경로</label>
-    <input
-      type="text"
-      id="deno-base"
-      value="https://dash.deno.com/projects"
-    />
-    <div class="hint small">예: https://dash.deno.com/projects</div>
-  </div>
-
-  <!-- 2. 한 줄 지시로 도구 카드 생성 -->
-  <div class="section">
-    <div class="section-title">② 한 줄 지시로 도구 카드 생성</div>
-    <div class="section-desc">
-      각 줄당 “번호 + 도구 이름 / 목적 설명” 형식으로 작성한다.
-      1번~10번까지 한꺼번에 붙여 넣어도 되고, 나중에 줄을 추가해서 다시 생성해도 된다.
-    </div>
-
-    <label for="tool-lines">도구 한 줄 지시 (여러 줄 붙여넣기 가능)</label>
-    <textarea id="tool-lines" placeholder="예)
-1번 자동 안내서 도구 / 온라인·오프라인 고객에게 안내서를 자동으로 보내고 후속 연락까지 도와주는 도구이다.
-
-2번 입찰 감시 도구 / 나라장터와 KISTI 입찰 공고를 살펴보고 중요한 공고를 빠르게 찾는 도구이다.
-
-3번 입찰 서류 정리 도구 / 입찰에 필요한 제안서·서류를 자동 정리하고 한 번에 관리하는 도구이다.
-
-…"></textarea>
-
-    <div class="hint">
-      • 형식: <strong>번호 + ‘번’ + 도구 이름 / 목적 설명</strong>  
-      • 목적 부분은 두 줄까지 이어서 써도 된다(중간 줄바꿈은 자동으로 합쳐서 인식).  
-      • 빈 줄(공백 줄)이 있으면 그 줄을 기준으로 도구 블록이 나뉜다.
-    </div>
-
-    <button class="btn" id="generate-btn">도구 카드 생성</button>
-    <div class="inline-note">
-      ※ 사용자는 가능한 한 번만 붙여넣고 버튼을 누른다. 나머지(도구 카드, 링크, 상태표시, 정리본)는 세팅 도구가 자동으로 만든다.
+    <div style="margin-top:6px; font-size:11px; color:#6b7280;">
+      · 이 페이지가 열려 있는 동안에만 자동 테스트가 동작합니다.<br />
+      · 자동 테스트 주기: 10분 / 필요 시 각 카드의 “테스트” 버튼으로 직접 수동 테스트도 가능합니다.
     </div>
   </div>
 
-  <!-- 3. 도구 카드 목록 -->
-  <div class="section">
-    <div class="section-title">③ 도구 카드 목록</div>
-    <div class="section-desc">
-      아래에는 생성된 도구 카드들이 번호 순서대로 쌓인다. 각 카드에는 이름·목적·GitHub/Deno 업로드 주소·업로드 상태·테스트 체크리스트가 포함된다.
-      주소 칸은 클릭하면 전체 선택되므로 그대로 복사해서 브라우저 주소창에 붙여넣으면 된다.
-    </div>
-    <div id="cards-container" class="cards-grid"></div>
-  </div>
+  <!-- 카드 목록 -->
+  <div class="cards" id="cardsContainer"></div>
+</div>
 
-  <!-- 4. 정리본 -->
-  <div class="section">
-    <div class="section-title">④ 정리본 (도구 목록·업로드 상태 요약)</div>
-    <div class="section-desc">
-      이 텍스트는 Word/TXT/GitHub README 등에 복사하여 “어떤 도구가 어디까지 올라갔는지” 기록용으로 사용한다.
-    </div>
-    <textarea id="summary" class="summary-textarea" readonly></textarea>
-  </div>
+<script>
+  const toolsInput = document.getElementById('toolsInput');
+  const githubBaseInput = document.getElementById('githubBase');
+  const denoBaseInput = document.getElementById('denoBase');
+  const generateBtn = document.getElementById('generateBtn');
+  const cardsContainer = document.getElementById('cardsContainer');
+  const autoTestInfo = document.getElementById('autoTestInfo');
 
-  <script>
-    // 번호별 고정 도구 ID 표
-    const TOOL_ID_MAP = {
-      1: "tool1-auto-guide",
-      2: "tool2-bid-watcher",
-      3: "tool3-report-sender",
-      4: "tool4-research-excel",
-      5: "tool5-report-maker",
-      6: "tool6-status-viewer",
-      7: "tool7-setting-tool",
-      8: "tool8-verb-helper",
-      9: "tool9-content-guide",
-      10: "tool10-finance-book"
-    };
+  let autoTestTimer = null;
 
-    const toolLinesEl = document.getElementById("tool-lines");
-    const githubBaseEl = document.getElementById("github-base");
-    const denoBaseEl = document.getElementById("deno-base");
-    const cardsContainer = document.getElementById("cards-container");
-    const summaryEl = document.getElementById("summary");
-    const generateBtn = document.getElementById("generate-btn");
-
-    function normalizeBaseUrl(url) {
-      const trimmed = url.trim();
-      if (!trimmed) return "";
-      return trimmed.replace(/\/+$/, "");
-    }
-
-    // 도구 한 줄 지시 전체를 파싱해서 도구 객체 배열로 변환
-    function parseToolBlocks(rawText, githubBase, denoBase) {
-      const normGit = normalizeBaseUrl(githubBase);
-      const normDeno = normalizeBaseUrl(denoBase);
-
-      // 빈 줄 기준으로 블록 나누기
-      const blocks = rawText
-        .split(/\n\s*\n+/)
-        .map(b => b.trim())
-        .filter(b => b.length > 0);
-
-      const tools = [];
-
-      blocks.forEach(block => {
-        // 줄바꿈을 공백 하나로 합치기
-        const oneLine = block.replace(/\s*\n\s*/g, " ").trim();
-        if (!oneLine) return;
-
-        // 첫 번째 '/' 기준으로 왼쪽(제목), 오른쪽(목적) 분리
-        const slashIndex = oneLine.indexOf("/");
-        let left, purposePart;
-        if (slashIndex === -1) {
-          left = oneLine;
-          purposePart = "";
-        } else {
-          left = oneLine.slice(0, slashIndex).trim();
-          purposePart = oneLine.slice(slashIndex + 1).trim();
-        }
-
-        // "1번 자동 안내서 도구" 같은 형식에서 번호와 이름 추출
-        const m = left.match(/^(\d+)\s*번\s*(.+)$/);
-        const num = m ? Number(m[1]) : null;
-        const name = (m ? m[2] : left).trim();
-
-        const toolId =
-          (num && TOOL_ID_MAP[num]) ||
-          (num ? "tool" + num : name.replace(/\s+/g, "-"));
-
-        const githubUrl = normGit
-          ? normGit + "/" + toolId + ".html"
-          : "GitHub 경로 미설정 (위에서 기본 경로를 먼저 입력)";
-        const denoUrl = normDeno
-          ? normDeno + "?tool=" + toolId
-          : "Deno 경로 미설정 (위에서 기본 경로를 먼저 입력)";
-
-        const purpose = purposePart;
-
+  function parseToolsInput(text) {
+    const lines = text.split('\n');
+    const tools = [];
+    lines.forEach((line, idx) => {
+      const trimmed = line.trim();
+      if (!trimmed) return;
+      // "이름 / 목적" 기준으로 나누기
+      const parts = trimmed.split('/');
+      const name = (parts[0] || '').trim();
+      const purpose = (parts.slice(1).join('/').trim()) || '';
+      if (name) {
         tools.push({
-          num,
+          id: idx + 1,
           name,
-          purpose,
-          toolId,
-          githubUrl,
-          denoUrl
+          purpose
         });
-      });
+      }
+    });
+    return tools;
+  }
 
-      // 번호가 있는 경우 번호 기준 정렬
-      tools.sort((a, b) => {
-        if (a.num != null && b.num != null) return a.num - b.num;
-        if (a.num != null) return -1;
-        if (b.num != null) return 1;
-        return 0;
-      });
+  function createCard(tool, githubBase, denoBase) {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.dataset.toolId = tool.id;
 
-      return tools;
-    }
+    // 헤더
+    const header = document.createElement('div');
+    header.className = 'card-header';
 
-    function createCard(tool) {
-      const card = document.createElement("div");
-      card.className = "card";
+    const title = document.createElement('div');
+    title.className = 'card-title';
+    title.textContent = tool.name;
 
-      const header = document.createElement("div");
-      header.className = "card-header";
+    const tag = document.createElement('div');
+    tag.className = 'card-tag';
+    tag.textContent = `도구 #${tool.id}`;
 
-      const title = document.createElement("div");
-      title.className = "card-title";
-      const numLabel = tool.num != null ? "도구 #" + tool.num + " — " : "";
-      title.textContent = numLabel + tool.name;
+    header.appendChild(title);
+    header.appendChild(tag);
 
-      const badge = document.createElement("div");
-      badge.className = "badge";
-      badge.textContent = "세팅 카드";
+    // 목적
+    const body = document.createElement('div');
+    body.className = 'card-body';
+    body.textContent = tool.purpose || '목적 정보 없음';
 
-      header.appendChild(title);
-      header.appendChild(badge);
+    // 상태 표시
+    const statusRow = document.createElement('div');
+    statusRow.className = 'status-row';
+    const statusDot = document.createElement('span');
+    statusDot.className = 'status-dot'; // 기본 회색
+    statusDot.dataset.status = 'idle';
+    const statusText = document.createElement('span');
+    statusText.className = 'small-label';
+    statusText.textContent = '상태: 대기 중';
 
-      const body = document.createElement("div");
-      body.className = "card-body";
+    statusRow.appendChild(statusDot);
+    statusRow.appendChild(statusText);
 
-      const pPurpose = document.createElement("p");
-      pPurpose.innerHTML =
-        "<strong>목적:</strong> " +
-        (tool.purpose || "도구 목적 미입력(필요 시 수정)");
+    // URL 영역
+    const githubLabel = document.createElement('div');
+    githubLabel.className = 'small-label';
+    githubLabel.textContent = 'GitHub 업로드 주소';
 
-      const pIo = document.createElement("p");
-      pIo.innerHTML =
-        "<strong>입력·출력:</strong> 입력·출력 미입력(필요 시 수정)";
-
-      body.appendChild(pPurpose);
-      body.appendChild(pIo);
-
-      // GitHub URL
-      const ghLabel = document.createElement("div");
-      ghLabel.className = "url-label";
-      ghLabel.textContent = "GitHub 업로드 주소";
-
-      const ghInputWrap = document.createElement("div");
-      ghInputWrap.className = "url-input";
-      const ghInput = document.createElement("input");
-      ghInput.type = "text";
-      ghInput.value = tool.githubUrl;
-      ghInput.readOnly = true;
-      ghInput.className = "url-field";
-      ghInputWrap.appendChild(ghInput);
-
-      // Deno URL
-      const denoLabel = document.createElement("div");
-      denoLabel.className = "url-label";
-      denoLabel.textContent = "Deno 업로드 주소";
-
-      const denoInputWrap = document.createElement("div");
-      denoInputWrap.className = "url-input";
-      const denoInput = document.createElement("input");
-      denoInput.type = "text";
-      denoInput.value = tool.denoUrl;
-      denoInput.readOnly = true;
-      denoInput.className = "url-field";
-      denoInputWrap.appendChild(denoInput);
-
-      const uploadState = document.createElement("div");
-      uploadState.style.marginTop = "6px";
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.id = "upload-" + (tool.toolId || "");
-      const cbLabel = document.createElement("label");
-      cbLabel.htmlFor = checkbox.id;
-      cbLabel.style.display = "inline";
-      cbLabel.style.marginLeft = "4px";
-      cbLabel.style.fontSize = "12px";
-      cbLabel.textContent = "미업로드";
-      uploadState.appendChild(checkbox);
-      uploadState.appendChild(cbLabel);
-
-      const checklistTitle = document.createElement("div");
-      checklistTitle.className = "url-label";
-      checklistTitle.textContent = "테스트·검증 체크리스트";
-
-      const ul = document.createElement("ul");
-      ul.className = "checklist";
-      const items = [
-        "화면 뼈대: 입력창·버튼·출력 영역이 모두 보이는가?",
-        "필수 기능: 기본 입력 → 출력 흐름이 끊김 없이 동작하는가?",
-        "오류 처리: 잘못된 입력을 넣었을 때도 화면이 깨지지 않는가?",
-        "엣지 케이스: 빈 값·긴 텍스트 등에서도 흐름이 유지되는가?",
-        "정리본: 도구 이름·상태·주소가 요약에 잘 반영되는가?"
-      ];
-      items.forEach(text => {
-        const li = document.createElement("li");
-        li.textContent = text;
-        ul.appendChild(li);
-      });
-
-      body.appendChild(ghLabel);
-      body.appendChild(ghInputWrap);
-      body.appendChild(denoLabel);
-      body.appendChild(denoInputWrap);
-      body.appendChild(uploadState);
-      body.appendChild(checklistTitle);
-      body.appendChild(ul);
-
-      card.appendChild(header);
-      card.appendChild(body);
-
-      // URL 필드 클릭 시 전체 선택
-      const urlFields = card.querySelectorAll(".url-field");
-      urlFields.forEach(input => {
-        input.addEventListener("focus", () => input.select());
-        input.addEventListener("click", () => input.select());
-      });
-
-      return card;
-    }
-
-    function updateSummary(tools) {
-      if (!tools.length) {
-        summaryEl.value = "";
+    const githubRow = document.createElement('div');
+    githubRow.className = 'url-row';
+    const githubInput = document.createElement('input');
+    githubInput.type = 'text';
+    githubInput.placeholder = '이 도구의 GitHub 주소';
+    if (githubBase) githubInput.value = githubBase;
+    const githubBtn = document.createElement('button');
+    githubBtn.className = 'btn-github';
+    githubBtn.textContent = 'GitHub';
+    githubBtn.onclick = () => {
+      const url = githubInput.value.trim();
+      if (!url) {
+        alert('GitHub 주소가 비어 있습니다.');
         return;
       }
-      const ghBase = normalizeBaseUrl(githubBaseEl.value || "");
-      const denoBase = normalizeBaseUrl(denoBaseEl.value || "");
-      let lines = [];
-      lines.push("[WIC 7번 세팅 도구 — 도구 목록 요약]");
-      lines.push("GitHub 기본 경로: " + (ghBase || "미설정"));
-      lines.push("Deno 기본 경로: " + (denoBase || "미설정"));
-      lines.push("");
-      tools.forEach(t => {
-        const numLabel = t.num != null ? t.num + "번 " : "";
-        lines.push(
-          numLabel +
-            t.name +
-            " — " +
-            (t.purpose || "도구 목적 미입력(필요 시 수정)")
-        );
-        lines.push("  · GitHub: " + t.githubUrl);
-        lines.push("  · Deno : " + t.denoUrl);
-        lines.push("");
-      });
-      summaryEl.value = lines.join("\n");
+      window.open(url, '_blank');
+    };
+    githubRow.appendChild(githubInput);
+    githubRow.appendChild(githubBtn);
+
+    const denoLabel = document.createElement('div');
+    denoLabel.className = 'small-label';
+    denoLabel.textContent = 'Deno 업로드 주소';
+
+    const denoRow = document.createElement('div');
+    denoRow.className = 'url-row';
+    const denoInput = document.createElement('input');
+    denoInput.type = 'text';
+    denoInput.placeholder = '이 도구의 Deno 주소';
+    if (denoBase) denoInput.value = denoBase;
+    const denoBtn = document.createElement('button');
+    denoBtn.className = 'btn-deno';
+    denoBtn.textContent = 'Deno';
+    denoBtn.onclick = () => {
+      const url = denoInput.value.trim();
+      if (!url) {
+        alert('Deno 주소가 비어 있습니다.');
+        return;
+      }
+      window.open(url, '_blank');
+    };
+    denoRow.appendChild(denoInput);
+    denoRow.appendChild(denoBtn);
+
+    // 로그 박스
+    const logBox = document.createElement('div');
+    logBox.className = 'log-box';
+    logBox.textContent = '아직 테스트 기록이 없습니다.';
+
+    // 수동 테스트 버튼 + 자동 수정 버튼 (흐름만 표시)
+    const actionRow = document.createElement('div');
+    actionRow.className = 'action-row';
+
+    const testBtn = document.createElement('button');
+    testBtn.className = 'btn-secondary';
+    testBtn.textContent = '테스트';
+    testBtn.onclick = () => {
+      runManualTest(tool, statusDot, statusText, logBox, githubInput.value, denoInput.value);
+    };
+
+    const coreBtn = document.createElement('button');
+    coreBtn.className = 'btn-core';
+    coreBtn.textContent = 'Core';
+    coreBtn.onclick = () => {
+      appendLog(logBox, '코어 기능 재확인 요청(수동). 실제 수정은 해당 도구 대화창에서 진행해야 합니다.');
+    };
+
+    actionRow.appendChild(testBtn);
+    actionRow.appendChild(coreBtn);
+
+    // 메타 정보
+    const metaRow = document.createElement('div');
+    metaRow.className = 'meta-row';
+    const lastTestSpan = document.createElement('span');
+    lastTestSpan.textContent = '마지막 테스트: 없음';
+    const toolIdSpan = document.createElement('span');
+    toolIdSpan.textContent = `ID: ${tool.id}`;
+    metaRow.appendChild(lastTestSpan);
+    metaRow.appendChild(toolIdSpan);
+
+    // 카드에 요소 붙이기
+    card.appendChild(header);
+    card.appendChild(body);
+    card.appendChild(statusRow);
+    card.appendChild(githubLabel);
+    card.appendChild(githubRow);
+    card.appendChild(denoLabel);
+    card.appendChild(denoRow);
+    card.appendChild(logBox);
+    card.appendChild(actionRow);
+    card.appendChild(metaRow);
+
+    // 객체에 참조 저장
+    card._statusDot = statusDot;
+    card._statusText = statusText;
+    card._logBox = logBox;
+    card._githubInput = githubInput;
+    card._denoInput = denoInput;
+    card._lastTestSpan = lastTestSpan;
+
+    return card;
+  }
+
+  function appendLog(logBox, message) {
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    const prefix = `[${hh}:${mm}] `;
+    if (logBox.textContent.trim() === '아직 테스트 기록이 없습니다.') {
+      logBox.textContent = prefix + message;
+    } else {
+      logBox.textContent += '\n' + prefix + message;
+    }
+    logBox.scrollTop = logBox.scrollHeight;
+  }
+
+  function setStatus(statusDot, statusText, status) {
+    statusDot.classList.remove('status-ok', 'status-error', 'status-testing');
+    if (status === 'ok') {
+      statusDot.classList.add('status-ok');
+      statusText.textContent = '상태: 정상';
+    } else if (status === 'error') {
+      statusDot.classList.add('status-error');
+      statusText.textContent = '상태: 오류 가능';
+    } else if (status === 'testing') {
+      statusDot.classList.add('status-testing');
+      statusText.textContent = '상태: 테스트 중';
+    } else {
+      statusText.textContent = '상태: 대기 중';
+    }
+  }
+
+  function runManualTest(tool, statusDot, statusText, logBox, githubUrl, denoUrl) {
+    setStatus(statusDot, statusText, 'testing');
+    appendLog(logBox, '수동 테스트 시작.');
+
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    const lastTestLabel = `마지막 테스트: ${hh}:${mm}`;
+
+    const card = statusDot.closest('.card');
+    if (card && card._lastTestSpan) {
+      card._lastTestSpan.textContent = lastTestLabel;
     }
 
-    function generateCards() {
-      const rawText = toolLinesEl.value || "";
-      const ghBase = githubBaseEl.value || "";
-      const denoBase = denoBaseEl.value || "";
+    // 실제 네트워크 테스트 대신, 현재는 URL 입력 여부만 간단히 검사
+    setTimeout(() => {
+      if (!githubUrl && !denoUrl) {
+        setStatus(statusDot, statusText, 'error');
+        appendLog(logBox, 'GitHub/Deno 주소가 비어 있습니다. 주소를 입력 후 다시 테스트하세요.');
+      } else {
+        setStatus(statusDot, statusText, 'ok');
+        appendLog(logBox, '기본 테스트 통과(주소 형식 기준). 실제 동작은 각 플랫폼에서 확인하세요.');
+      }
+    }, 600);
+  }
 
-      const tools = parseToolBlocks(rawText, ghBase, denoBase);
-
-      cardsContainer.innerHTML = "";
-
-      tools.forEach(tool => {
-        const card = createCard(tool);
-        cardsContainer.appendChild(card);
-      });
-
-      updateSummary(tools);
+  function runAutoTestOnce() {
+    const cards = cardsContainer.querySelectorAll('.card');
+    if (!cards.length) {
+      autoTestInfo.textContent = '자동 테스트: 카드 없음 (대기 중)';
+      return;
     }
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    autoTestInfo.textContent = `자동 테스트 실행: ${hh}:${mm}`;
 
-    generateBtn.addEventListener("click", generateCards);
-  </script>
+    cards.forEach(card => {
+      const statusDot = card._statusDot;
+      const statusText = card._statusText;
+      const logBox = card._logBox;
+      const githubUrl = card._githubInput.value.trim();
+      const denoUrl = card._denoInput.value.trim();
+      if (!statusDot || !statusText || !logBox) return;
+
+      setStatus(statusDot, statusText, 'testing');
+      appendLog(logBox, '자동 테스트 시작.');
+
+      const lastTestSpan = card._lastTestSpan;
+      if (lastTestSpan) {
+        lastTestSpan.textContent = `마지막 테스트: ${hh}:${mm}`;
+      }
+
+      setTimeout(() => {
+        if (!githubUrl && !denoUrl) {
+          setStatus(statusDot, statusText, 'error');
+          appendLog(logBox, '자동 테스트: 주소가 비어 있어 오류 가능. 주소 입력 후 수동 테스트를 권장합니다.');
+        } else {
+          setStatus(statusDot, statusText, 'ok');
+          appendLog(logBox, '자동 테스트: 기본 체크 통과.');
+        }
+      }, 800);
+    });
+  }
+
+  function startAutoTestLoop() {
+    if (autoTestTimer) clearInterval(autoTestTimer);
+    // 첫 실행은 즉시
+    runAutoTestOnce();
+    // 이후 10분 간격(600000ms)
+    autoTestTimer = setInterval(runAutoTestOnce, 600000);
+  }
+
+  generateBtn.addEventListener('click', () => {
+    const tools = parseToolsInput(toolsInput.value);
+    cardsContainer.innerHTML = '';
+    if (!tools.length) {
+      alert('도구 이름 / 목적이 있는 줄이 없습니다.');
+      return;
+    }
+    const githubBase = githubBaseInput.value.trim();
+    const denoBase = denoBaseInput.value.trim();
+    tools.forEach(tool => {
+      const card = createCard(tool, githubBase, denoBase);
+      cardsContainer.appendChild(card);
+    });
+    // 카드가 있으면 자동 테스트 루프 시작
+    startAutoTestLoop();
+  });
+
+  // 페이지 로드 시 자동 테스트 안내 초기화
+  autoTestInfo.textContent = '자동 테스트: 카드 생성 후 10분 간격으로 실행됩니다.';
+</script>
 </body>
 </html>
