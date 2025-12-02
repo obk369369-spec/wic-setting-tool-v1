@@ -178,7 +178,23 @@
   <div class="section">
     <h2>① 도구 목록 & 기본 주소</h2>
     <label for="toolList">도구 목록 (한 줄당 1개)</label>
-    <textarea id="toolList" placeholder="1번 고객 자동화 안내서&#10;2번 입찰 프로그램&#10;3번 코딩 기초 연습 뼈대"></textarea>
+    <!-- 기본값: 네가 실제 사용하는 도구 목록 -->
+    <textarea id="toolList">1번 고객 자동화 안내서
+2번 입찰 프로그램
+3번 코딩 기초 연습 뼈대
+4번 연구비 박사 엑셀 생성기
+5번 보고서 생성기
+7번 세팅 도구
+8번 동사 활용 도구
+9번 컨텐츠 자료 안내 도구
+10번 재무 회계 프로그램
+11번 재테크 프로그램
+12번 서브 웹사이트 제작
+13번 엑셀 자동 업로드
+14번 홈페이지 수정 프로그램
+15번 공통엔진 모듈 테스트기
+18번 Tool Policy 도구 기능 정책
+19번 사업장 홍보 프로그램</textarea>
 
     <div class="row">
       <div>
@@ -258,7 +274,9 @@
         const obj = JSON.parse(raw);
         if (obj && typeof obj === "object") {
           state = Object.assign(state, obj);
-          document.getElementById("toolList").value = state.toolListText || "";
+          if (state.toolListText) {
+            document.getElementById("toolList").value = state.toolListText;
+          }
           document.getElementById("githubBase").value = state.githubBase || "";
           document.getElementById("denoBase").value = state.denoBase || "";
         }
@@ -337,7 +355,7 @@
         title.textContent = name;
         const chip = document.createElement("div");
         chip.className = "card-chip";
-        chip.textContent = (sortedIndex + 1) + "번 카드"; // 실제 순서
+        chip.textContent = (sortedIndex + 1) + "번 카드";
         header.appendChild(title);
         header.appendChild(chip);
         card.appendChild(header);
@@ -461,7 +479,6 @@
         container.appendChild(card);
       });
 
-      // 사용하지 않는 카드 정리
       state.cards = state.cards.filter(c => usedNames.includes(c.name));
       saveState();
     }
@@ -518,11 +535,29 @@
         denoBase: "",
         cards: []
       };
-      document.getElementById("toolList").value = "";
+      // 기본값 그대로 다시 적용
+      document.getElementById("toolList").value =
+`1번 고객 자동화 안내서
+2번 입찰 프로그램
+3번 코딩 기초 연습 뼈대
+4번 연구비 박사 엑셀 생성기
+5번 보고서 생성기
+7번 세팅 도구
+8번 동사 활용 도구
+9번 컨텐츠 자료 안내 도구
+10번 재무 회계 프로그램
+11번 재테크 프로그램
+12번 서브 웹사이트 제작
+13번 엑셀 자동 업로드
+14번 홈페이지 수정 프로그램
+15번 공통엔진 모듈 테스트기
+18번 Tool Policy 도구 기능 정책
+19번 사업장 홍보 프로그램`;
       document.getElementById("githubBase").value = "";
       document.getElementById("denoBase").value = "";
       document.getElementById("cardsContainer").innerHTML = "";
       document.getElementById("autosaveStatus").textContent = "초기화 완료";
+      buildCards();
     }
 
     // ----- 초기화 -----
