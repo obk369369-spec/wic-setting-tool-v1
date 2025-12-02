@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>WIC 세팅 도구 v2 — 카드형 세팅 & 안정화 버전 (정상 구조)</title>
+  <title>WIC 세팅 도구 v2 — 카드형 세팅 & 안정화 버전 (업로드 주소 + 자동 테스트/수정)</title>
   <style>
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -103,7 +103,7 @@
     }
     .cards-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 10px;
     }
     .card {
@@ -114,7 +114,7 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
-      min-height: 160px;
+      min-height: 180px;
     }
     .card-header {
       display: flex;
@@ -203,8 +203,8 @@
     <h2>② 자동 테스트 규칙</h2>
     <div class="small-text">
       · 테스트는 네트워크 요청 없이 문자열 규칙만으로 판단한다.<br/>
-      · GitHub/Deno 주소가 비어 있거나 http로 시작하지 않으면 오류 가능.<br/>
-      · 두 주소 모두 http로 시작하면 정상으로 표시되고 로그를 남긴다.
+      · GitHub/Deno/업로드 주소가 비어 있거나 http로 시작하지 않으면 오류 가능.<br/>
+      · 세 주소 모두 http로 시작하면 정상으로 표시되고 로그를 남긴다.
     </div>
   </div>
 
@@ -220,7 +220,7 @@
       toolListText: "",
       githubBase: "",
       denoBase: "",
-      cards: [] // { name, github, deno, status, log, last, choice }
+      cards: [] // { name, github, deno, upload, status, log, last, choice }
     };
 
     function now() {
@@ -275,23 +275,40 @@
           name,
           github: "",
           deno: "",
+          upload: "",
           status: "대기",
           log: "",
           last: "",
           choice: ""
         };
         state.cards.push(card);
+      } else {
+        // 이전 상태에 upload가 없었던 경우 대비
+        if (card.upload === undefined) card.upload = "";
       }
       return card;
     }
 
-    function validate(g, d) {
+    function validateTriple(g, d, u) {
       g = (g || "").trim();
       d = (d || "").trim();
-      if (!g && !d) return { ok: false, reason: "GitHub/Deno 주소가 비어 있음" };
-      if (!g || !d) return { ok: false, reason: "한쪽 주소만 입력됨" };
-      if (!g.startsWith("http") || !d.startsWith("http"))
-        return { ok: false, reason: "주소가 http로 시작해야 함" };
+      u = (u || "").trim();
+
+      const missing = [];
+      if (!g) missing.push("GitHub");
+      if (!d) missing.push("Deno");
+      if (!u) missing.push("업로드");
+
+      if (missing.length === 3) {
+        return { ok: false, reason: "세 주소 모두 비어 있음" };
+      }
+      if (missing.length > 0) {
+        return { ok: false, reason: missing.join(", ") + " 주소가 비어 있음" };
+      }
+
+      if (!g.startsWith("http") || !d.startsWith("http") || !u.startsWith("http")) {
+        return { ok: false, reason: "모든 주소는 http로 시작해야 함" };
+      }
       return { ok: true, reason: "정상" };
     }
 
@@ -375,7 +392,7 @@
         deInput.type = "text";
         deInput.placeholder = state.denoBase
           ? state.denoBase + "/…"
-          : "이 도구 Deno 주소";
+          : "이 도구 Deno 설정/프로젝트 주소";
         deInput.value = c.deno || "";
         const deBtn = document.createElement("button");
         deBtn.className = "small";
@@ -387,6 +404,24 @@
         deRow.appendChild(deInput);
         deRow.appendChild(deBtn);
         card.appendChild(deRow);
+
+        // 업로드 주소 입력
+        const upRow = document.createElement("div");
+        upRow.className = "card-row";
+        const upInput = document.createElement("input");
+        upInput.type = "text";
+        upInput.placeholder = "이 도구 업로드 주소 (예: https://…deno.net/)";
+        upInput.value = c.upload || "";
+        const upBtn = document.createElement("button");
+        upBtn.className = "small";
+        upBtn.textContent = "업로드 열기";
+        upBtn.onclick = () => {
+          const url = upInput.value.trim();
+          if (url.startsWith("http")) window.open(url, "_blank");
+        };
+        upRow.appendChild(upInput);
+        upRow.appendChild(upBtn);
+        card.appendChild(upRow);
 
         // 상태 표시
         const statusLine = document.createElement("div");
@@ -428,7 +463,7 @@
         });
         card.appendChild(errArea);
 
-        // 버튼들 (주소 저장 + 테스트)
+        // 버튼들 (주소 저장 + 자동 수정 + 자동 테스트)
         const btnRow = document.createElement("div");
         btnRow.className = "card-row";
 
@@ -438,17 +473,41 @@
         saveBtn.onclick = () => {
           c.github = ghInput.value.trim();
           c.deno = deInput.value.trim();
+          c.upload = upInput.value.trim();
           saveState();
+        };
+
+        const fixBtn = document.createElement("button");
+        fixBtn.className = "small";
+        fixBtn.textContent = "자동 수정";
+        fixBtn.onclick = () => {
+          c.github = ghInput.value.trim();
+          c.deno = deInput.value.trim();
+          c.upload = upInput.value.trim();
+          c.status = "대기";
+          c.log = "자동 수정 실행: " + now();
+          c.last = now();
+          saveState();
+          buildCards();
         };
 
         const testBtn = document.createElement("button");
         testBtn.className = "small primary";
-        testBtn.textContent = "테스트";
+        testBtn.textContent = "자동 테스트";
         testBtn.onclick = () => {
-          runSingleTest(name, ghInput, deInput, stSpan, timeSpan, logArea);
+          runSingleTest(
+            name,
+            ghInput,
+            deInput,
+            upInput,
+            stSpan,
+            timeSpan,
+            logArea
+          );
         };
 
         btnRow.appendChild(saveBtn);
+        btnRow.appendChild(fixBtn);
         btnRow.appendChild(testBtn);
         card.appendChild(btnRow);
 
@@ -466,16 +525,18 @@
     }
 
     // ----- 테스트 -----
-    function runSingleTest(name, ghInput, deInput, statusSpan, timeSpan, logArea) {
+    function runSingleTest(name, ghInput, deInput, upInput, statusSpan, timeSpan, logArea) {
       const c = ensureCard(name);
       const g = ghInput.value;
       const d = deInput.value;
-      const r = validate(g, d);
+      const u = upInput.value;
+      const r = validateTriple(g, d, u);
 
       c.github = (g || "").trim();
       c.deno = (d || "").trim();
+      c.upload = (u || "").trim();
       c.last = now();
-      c.log = "테스트: " + c.last + " / 결과: " + r.reason;
+      c.log = "자동 테스트: " + c.last + " / 결과: " + r.reason;
 
       if (r.ok) {
         c.status = "정상";
@@ -496,15 +557,17 @@
       cards.forEach(card => {
         const name = card.dataset.name;
         const inputs = card.querySelectorAll("input[type='text']");
-        if (inputs.length < 2) return;
+        if (inputs.length < 3) return;
         const ghInput = inputs[0];
         const deInput = inputs[1];
+        const upInput = inputs[2];
         const statusSpan = card.querySelector(
           ".status-ok, .status-warn, .status-neutral"
         );
-        const timeSpan = card.querySelector(".small-text");
+        // statusSpan 바로 다음이 timeSpan (작은 글씨)
+        const timeSpan = statusSpan.nextSibling;
         const logArea = card.querySelector(".log");
-        runSingleTest(name, ghInput, deInput, statusSpan, timeSpan, logArea);
+        runSingleTest(name, ghInput, deInput, upInput, statusSpan, timeSpan, logArea);
       });
     }
 
