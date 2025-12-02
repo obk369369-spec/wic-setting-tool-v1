@@ -163,15 +163,6 @@
       font-size: 11px;
       color: #4b5563;
     }
-    .pill {
-      display: inline-block;
-      padding: 2px 7px;
-      border-radius: 999px;
-      font-size: 11px;
-      background: #e5e7eb;
-      color: #111827;
-      margin-right: 4px;
-    }
   </style>
 </head>
 <body>
@@ -186,104 +177,81 @@
 
   <div class="section">
     <h2>① 도구 목록 & 기본 주소</h2>
-    <label for="toolList">도구 목록 (한 줄당 1개, 예: "1번 고객 자동화 안내서")</label>
-    <textarea id="toolList" placeholder="1번 고객 자동화 안내서&#10;2번 입찰 프로그램&#10;3번 코딩 기초 연습 뼈대&#10;..."></textarea>
+    <label for="toolList">도구 목록 (한 줄당 1개)</label>
+    <textarea id="toolList" placeholder="1번 고객 자동화 안내서&#10;2번 입찰 프로그램&#10;3번 코딩 기초 연습 뼈대"></textarea>
 
     <div class="row">
       <div>
         <label for="githubBase">GitHub 기본 주소</label>
-        <input id="githubBase" type="text" placeholder="예: https://github.com/obk369369-spec" />
+        <input id="githubBase" type="text" placeholder="https://github.com/사용자명" />
       </div>
       <div>
         <label for="denoBase">Deno 기본 주소</label>
-        <input id="denoBase" type="text" placeholder="예: https://dash.deno.com/projects" />
+        <input id="denoBase" type="text" placeholder="https://dash.deno.com/projects" />
       </div>
     </div>
 
-    <div class="row" style="margin-top:4px;">
+    <div class="row">
       <button id="buildCardsBtn" class="primary">카드 생성 / 갱신</button>
       <button id="runAllTestsBtn">전체 자동 테스트 1회</button>
       <button id="clearStateBtn">데이터 초기화</button>
-      <div class="autosave" id="autosaveStatus">자동 저장 상태: 대기 중</div>
+      <div id="autosaveStatus" class="autosave">자동 저장 상태: 대기 중</div>
     </div>
   </div>
 
   <div class="section">
     <h2>② 자동 테스트 규칙</h2>
     <div class="small-text">
-      · 테스트는 네트워크 요청 없이 <strong>문자열 규칙</strong>만으로 판단한다.<br/>
-      · GitHub/Deno 주소가 비어 있거나, 공백만 있거나, "http"로 시작하지 않으면 <span class="status-warn">오류 가능</span>으로 표시된다.<br/>
-      · 두 주소 모두 "http"로 시작하면 <span class="status-ok">정상</span>으로 표시되고, 로그에 1회 테스트 결과만 기록한다.
+      · 테스트는 네트워크 요청 없이 문자열 규칙만으로 판단한다.<br/>
+      · GitHub/Deno 주소가 비어 있거나 http로 시작하지 않으면 오류 가능.<br/>
+      · 두 주소 모두 http로 시작하면 정상으로 표시되고 로그를 남긴다.
     </div>
   </div>
 
   <div class="section">
     <h2>③ 도구 카드 (자동 생성 영역)</h2>
-    <div id="cardsContainer" class="cards-grid">
-      <!-- JS가 카드 자동 생성 -->
-    </div>
-    <div class="small-text" style="margin-top:6px;">
-      · 도구 목록을 수정한 뒤 <strong>카드 생성 / 갱신</strong>을 누르면 카드 구성이 즉시 다시 만들어진다.<br/>
-      · 각 카드의 입력·로그·오류 선택지는 브라우저에 자동 저장되어, 새로고침 후에도 복원된다.
-    </div>
+    <div id="cardsContainer" class="cards-grid"></div>
   </div>
 
   <script>
-    // ===== 상태 구조 =====
     const STORAGE_KEY = "wic_setup_tool_v2_state";
 
     let state = {
       toolListText: "",
       githubBase: "",
       denoBase: "",
-      cards: [] // { name, github, deno, status, log, lastTest, errorChoice }
+      cards: []
     };
 
-    function nowTime() {
+    function now() {
       return new Date().toLocaleTimeString("ko-KR", { hour12: false });
     }
 
-    // ===== 상태 저장/복원 =====
     function saveState() {
-      try {
-        state.toolListText = document.getElementById("toolList").value;
-        state.githubBase = document.getElementById("githubBase").value;
-        state.denoBase = document.getElementById("denoBase").value;
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        const el = document.getElementById("autosaveStatus");
-        el.textContent = "자동 저장 상태: " + nowTime() + " 자동 저장 완료";
-      } catch (e) {
-        const el = document.getElementById("autosaveStatus");
-        el.textContent = "자동 저장 상태: 저장 실패(" + e.message + ")";
-      }
+      state.toolListText = document.getElementById("toolList").value;
+      state.githubBase = document.getElementById("githubBase").value;
+      state.denoBase = document.getElementById("denoBase").value;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      document.getElementById("autosaveStatus").textContent =
+        "자동 저장: " + now();
     }
 
     function loadState() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
       try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return;
         const obj = JSON.parse(raw);
-        if (!obj || typeof obj !== "object") return;
-        state = Object.assign(state, obj);
-        document.getElementById("toolList").value = state.toolListText || "";
-        document.getElementById("githubBase").value = state.githubBase || "";
-        document.getElementById("denoBase").value = state.denoBase || "";
-      } catch (e) {
-        // 복원 실패는 조용히 무시
-      }
+        if (obj) {
+          state = obj;
+          document.getElementById("toolList").value = state.toolListText || "";
+          document.getElementById("githubBase").value = state.githubBase || "";
+          document.getElementById("denoBase").value = state.denoBase || "";
+        }
+      } catch (_) {}
     }
 
-    // ===== 유틸 =====
-    function normalizeName(line) {
-      return line.trim();
-    }
-
-    function findCardState(name) {
-      return state.cards.find(c => c.name === name);
-    }
-
-    function ensureCardState(name) {
-      let card = findCardState(name);
+    function ensureCard(name) {
+      let card = state.cards.find(c => c.name === name);
       if (!card) {
         card = {
           name,
@@ -291,58 +259,49 @@
           deno: "",
           status: "대기",
           log: "",
-          lastTest: "",
-          errorChoice: ""
+          last: "",
+          choice: ""
         };
         state.cards.push(card);
       }
       return card;
     }
 
-    function validateAddresses(github, deno) {
-      const g = (github || "").trim();
-      const d = (deno || "").trim();
-      if (!g && !d) {
-        return { ok: false, reason: "GitHub/Deno 주소가 비어 있음" };
-      }
-      if (!g || !d) {
-        return { ok: false, reason: "GitHub 또는 Deno 중 하나만 입력됨" };
-      }
-      if (!g.startsWith("http") || !d.startsWith("http")) {
-        return { ok: false, reason: "두 주소 모두 http로 시작해야 함" };
-      }
-      return { ok: true, reason: "형식상 정상" };
+    function validate(g, d) {
+      g = g.trim();
+      d = d.trim();
+      if (!g && !d) return { ok: false, reason: "GitHub/Deno 주소가 비어 있음" };
+      if (!g || !d) return { ok: false, reason: "한쪽 주소만 입력됨" };
+      if (!g.startsWith("http") || !d.startsWith("http"))
+        return { ok: false, reason: "주소가 http로 시작해야 함" };
+      return { ok: true, reason: "정상" };
     }
 
-    // ===== 카드 생성/갱신 =====
-    function buildCardsFromList() {
-      const listText = document.getElementById("toolList").value || "";
-      const lines = listText.split("\n")
-        .map(l => normalizeName(l))
-        .filter(l => l.length > 0);
+    function buildCards() {
+      const list = (document.getElementById("toolList").value || "")
+        .split("\n")
+        .map(x => x.trim())
+        .filter(x => x.length > 0);
 
       const container = document.getElementById("cardsContainer");
       container.innerHTML = "";
 
-      const usedNames = [];
+      const used = [];
 
-      lines.forEach((line, idx) => {
-        const name = line;
-        usedNames.push(name);
-        const cardState = ensureCardState(name);
+      list.forEach((name, idx) => {
+        const c = ensureCard(name);
+        used.push(name);
 
         const card = document.createElement("div");
         card.className = "card";
         card.dataset.name = name;
 
-        // 상단
         const header = document.createElement("div");
         header.className = "card-header";
 
         const title = document.createElement("div");
         title.className = "card-title";
         title.textContent = name;
-
         const chip = document.createElement("div");
         chip.className = "card-chip";
         chip.textContent = (idx + 1) + "번 도구";
@@ -351,211 +310,195 @@
         header.appendChild(chip);
         card.appendChild(header);
 
-        // 설명 (이름 그대로 한 줄)
         const desc = document.createElement("div");
         desc.className = "card-desc";
-        desc.textContent = "기능 요약: " + name + " (필요 시 나중에 교체 가능)";
+        desc.textContent = "기능 요약: " + name;
         card.appendChild(desc);
 
-        // GitHub 입력
         const ghRow = document.createElement("div");
         ghRow.className = "card-row";
         const ghInput = document.createElement("input");
         ghInput.type = "text";
         ghInput.placeholder = state.githubBase
-          ? state.githubBase + "/..."
+          ? state.githubBase + "/…"
           : "이 도구 GitHub 주소";
-        ghInput.value = cardState.github || "";
+        ghInput.value = c.github || "";
         const ghBtn = document.createElement("button");
         ghBtn.className = "small";
         ghBtn.textContent = "GitHub 열기";
         ghBtn.onclick = () => {
           const url = ghInput.value.trim();
-          if (url.startsWith("http")) window.open(url, "_blank");
+          if (url.startsWith("http")) window.open(url);
         };
         ghRow.appendChild(ghInput);
         ghRow.appendChild(ghBtn);
         card.appendChild(ghRow);
 
-        // Deno 입력
         const deRow = document.createElement("div");
         deRow.className = "card-row";
         const deInput = document.createElement("input");
         deInput.type = "text";
         deInput.placeholder = state.denoBase
-          ? state.denoBase + "/..."
+          ? state.denoBase + "/…"
           : "이 도구 Deno 주소";
-        deInput.value = cardState.deno || "";
+        deInput.value = c.deno || "";
         const deBtn = document.createElement("button");
         deBtn.className = "small";
         deBtn.textContent = "Deno 열기";
         deBtn.onclick = () => {
           const url = deInput.value.trim();
-          if (url.startsWith("http")) window.open(url, "_blank");
+          if (url.startsWith("http")) window.open(url);
         };
         deRow.appendChild(deInput);
         deRow.appendChild(deBtn);
         card.appendChild(deRow);
 
-        // 상태 라인
         const statusLine = document.createElement("div");
-        const statusSpan = document.createElement("span");
-        statusSpan.className = "status-neutral";
-        const statusLabel = cardState.status || "대기";
-        if (statusLabel === "정상") statusSpan.className = "status-ok";
-        else if (statusLabel === "오류 가능") statusSpan.className = "status-warn";
-        statusSpan.textContent = "상태: " + statusLabel;
+        const stSpan = document.createElement("span");
+        stSpan.textContent = "상태: " + c.status;
+        if (c.status === "정상") stSpan.className = "status-ok";
+        else if (c.status === "오류 가능") stSpan.className = "status-warn";
+        else stSpan.className = "status-neutral";
+
         const timeSpan = document.createElement("span");
         timeSpan.className = "small-text";
         timeSpan.style.marginLeft = "6px";
-        timeSpan.textContent = cardState.lastTest
-          ? "(마지막 테스트: " + cardState.lastTest + ")"
+        timeSpan.textContent = c.last
+          ? "(마지막 테스트: " + c.last + ")"
           : "(테스트 전)";
-        statusLine.appendChild(statusSpan);
+
+        statusLine.appendChild(stSpan);
         statusLine.appendChild(timeSpan);
         card.appendChild(statusLine);
 
-        // 오류 선택지
-        const errorArea = document.createElement("div");
-        errorArea.className = "small-text";
-        errorArea.textContent = "오류 시 선택지:";
-        const choices = [
-          "GitHub 재배포",
-          "Deno 재배포",
-          "코어 기능 재구성"
-        ];
-        choices.forEach(choice => {
+        const errArea = document.createElement("div");
+        errArea.className = "small-text";
+        errArea.textContent = "오류 시 선택지:";
+        ["GitHub 재배포", "Deno 재배포", "코어 기능 재구성"].forEach(choice => {
           const badge = document.createElement("span");
           badge.className = "badge";
           badge.textContent = choice;
-          if (cardState.errorChoice === choice) {
-            badge.classList.add("selected");
-          }
+          if (c.choice === choice) badge.classList.add("selected");
           badge.onclick = () => {
-            cardState.errorChoice = choice;
-            // 선택 상태 갱신
-            Array.from(errorArea.querySelectorAll(".badge")).forEach(b => {
-              b.classList.toggle("selected", b.textContent === choice);
-            });
+            c.choice = choice;
+            Array.from(errArea.querySelectorAll(".badge")).forEach(b =>
+              b.classList.toggle("selected", b.textContent === choice)
+            );
             saveState();
           };
-          errorArea.appendChild(badge);
+          errArea.appendChild(badge);
         });
-        card.appendChild(errorArea);
+        card.appendChild(errArea);
 
-        // 버튼들
         const btnRow = document.createElement("div");
         btnRow.className = "card-row";
+
         const saveBtn = document.createElement("button");
         saveBtn.className = "small";
         saveBtn.textContent = "주소 저장";
         saveBtn.onclick = () => {
-          cardState.github = ghInput.value.trim();
-          cardState.deno = deInput.value.trim();
+          c.github = ghInput.value.trim();
+          c.deno = deInput.value.trim();
           saveState();
         };
+
         const testBtn = document.createElement("button");
         testBtn.className = "small primary";
         testBtn.textContent = "테스트";
         testBtn.onclick = () => {
-          runSingleTest(name, ghInput.value, deInput.value, statusSpan, timeSpan, logArea);
+          const r = validate(ghInput.value, deInput.value);
+          c.github = ghInput.value.trim();
+          c.deno = deInput.value.trim();
+          c.last = now();
+          c.log = "테스트: " + c.last + " / 결과: " + r.reason;
+          if (r.ok) {
+            c.status = "정상";
+            stSpan.className = "status-ok";
+          } else {
+            c.status = "오류 가능";
+            stSpan.className = "status-warn";
+          }
+          stSpan.textContent = "상태: " + c.status;
+          timeSpan.textContent = "(마지막 테스트: " + c.last + ")";
+          logArea.textContent = c.log;
+          saveState();
         };
+
         btnRow.appendChild(saveBtn);
         btnRow.appendChild(testBtn);
         card.appendChild(btnRow);
 
-        // 로그
         const logArea = document.createElement("div");
         logArea.className = "log";
-        logArea.textContent = cardState.log || "로그: 아직 없음";
+        logArea.textContent = c.log || "로그: 아직 없음";
         card.appendChild(logArea);
 
         container.appendChild(card);
       });
 
-      // state.cards에서 사용되지 않는 항목은 그대로 두되, 저장은 새 카드 기준으로 진행
-      state.cards = state.cards.filter(c => usedNames.includes(c.name));
+      state.cards = state.cards.filter(c => used.includes(c.name));
       saveState();
     }
 
-    // ===== 테스트 실행 =====
-    function runSingleTest(name, ghValue, deValue, statusSpan, timeSpan, logArea) {
-      const cardState = ensureCardState(name);
-      const res = validateAddresses(ghValue, deValue);
-      const t = nowTime();
-      cardState.github = ghValue.trim();
-      cardState.deno = deValue.trim();
-      cardState.lastTest = t;
-
-      if (res.ok) {
-        cardState.status = "정상";
-        statusSpan.className = "status-ok";
-      } else {
-        cardState.status = "오류 가능";
-        statusSpan.className = "status-warn";
-      }
-      statusSpan.textContent = "상태: " + cardState.status;
-      timeSpan.textContent = "(마지막 테스트: " + t + ")";
-      cardState.log = "테스트 시간: " + t + " · 결과: " + res.reason;
-      logArea.textContent = cardState.log;
-      saveState();
-    }
-
-    function runAllTestsOnce() {
-      const container = document.getElementById("cardsContainer");
-      const cards = Array.from(container.querySelectorAll(".card"));
+    function testAll() {
+      const cards = document.querySelectorAll(".card");
       cards.forEach(card => {
         const name = card.dataset.name;
-        const ghInput = card.querySelector(".card-row input[type='text']");
-        const inputs = card.querySelectorAll(".card-row input[type='text']");
-        const gh = inputs[0] ? inputs[0].value : "";
-        const de = inputs[1] ? inputs[1].value : "";
-        const statusSpan = card.querySelector(".status-ok, .status-warn, .status-neutral");
+        const inputs = card.querySelectorAll("input[type='text']");
+        const gh = inputs[0].value;
+        const de = inputs[1].value;
+        const statusSpan = card.querySelector(
+          ".status-ok, .status-warn, .status-neutral"
+        );
         const timeSpan = card.querySelector(".small-text");
         const logArea = card.querySelector(".log");
-        if (name && statusSpan && timeSpan && logArea) {
-          runSingleTest(name, gh, de, statusSpan, timeSpan, logArea);
+
+        const c = state.cards.find(x => x.name === name);
+        const r = validate(gh, de);
+
+        c.github = gh.trim();
+        c.deno = de.trim();
+        c.last = now();
+        c.log = "테스트: " + c.last + " / 결과: " + r.reason;
+
+        if (r.ok) {
+          c.status = "정상";
+          statusSpan.className = "status-ok";
+        } else {
+          c.status = "오류 가능";
+          statusSpan.className = "status-warn";
         }
+
+        statusSpan.textContent = "상태: " + c.status;
+        timeSpan.textContent = "(마지막 테스트: " + c.last + ")";
+        logArea.textContent = c.log;
       });
+
+      saveState();
     }
 
-    function clearState() {
-      if (!confirm("저장된 세팅 도구 상태를 모두 지울까요?")) return;
-      state = {
-        toolListText: "",
-        githubBase: "",
-        denoBase: "",
-        cards: []
-      };
+    function clearAll() {
+      if (!confirm("모든 데이터를 초기화할까요?")) return;
+      localStorage.removeItem(STORAGE_KEY);
+      state = { toolListText: "", githubBase: "", denoBase: "", cards: [] };
       document.getElementById("toolList").value = "";
       document.getElementById("githubBase").value = "";
       document.getElementById("denoBase").value = "";
       document.getElementById("cardsContainer").innerHTML = "";
-      localStorage.removeItem(STORAGE_KEY);
-      document.getElementById("autosaveStatus").textContent = "자동 저장 상태: 초기화 완료";
+      document.getElementById("autosaveStatus").textContent = "초기화 완료";
     }
 
-    // ===== 이벤트 바인딩 =====
     document.addEventListener("DOMContentLoaded", () => {
       loadState();
-      buildCardsFromList();
+      buildCards();
 
-      document.getElementById("buildCardsBtn").onclick = () => {
-        buildCardsFromList();
-      };
-      document.getElementById("runAllTestsBtn").onclick = () => {
-        runAllTestsOnce();
-      };
-      document.getElementById("clearStateBtn").onclick = () => {
-        clearState();
-      };
+      document.getElementById("buildCardsBtn").onclick = buildCards;
+      document.getElementById("runAllTestsBtn").onclick = testAll;
+      document.getElementById("clearStateBtn").onclick = clearAll;
 
-      // 입력 변경 시 자동 저장 (숨은 타이머 없이 input 이벤트에만 반응)
       ["toolList", "githubBase", "denoBase"].forEach(id => {
         const el = document.getElementById(id);
-        el.addEventListener("input", () => {
-          saveState();
-        });
+        el.addEventListener("input", saveState);
       });
     });
   </script>
