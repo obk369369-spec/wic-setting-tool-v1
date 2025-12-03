@@ -478,52 +478,94 @@
         card.appendChild(errArea);
 
         // 버튼들 (주소 저장 + 자동 테스트)
-        const btnRow = document.createElement("div");
-        btnRow.className = "card-row";
+const btnRow = document.createElement("div");
+btnRow.className = "card-row";
 
-        const saveBtn = document.createElement("button");
-        saveBtn.className = "small";
-        saveBtn.textContent = "주소 저장";
+const saveBtn = document.createElement("button");
+saveBtn.className = "small";
+saveBtn.textContent = "주소 저장";
 saveBtn.onclick = () => {
   const g = ghInput.value.trim();
   const d = deInput.value.trim();
   let u = upInput.value.trim();
-
-  // 기본 저장
   c.github = g;
   c.deno = d;
-
-  // 업로드 주소가 비어 있고, Deno 콘솔 주소가 들어가 있으면 자동 생성
-  if (!u && d.startsWith("https://console.deno.com/obk369369-spec/")) {
-    const parts = d.split("/");
-    const slug = parts[parts.length - 1] || parts[parts.length - 2]; // .../07-wic-setting-tool-v1
-    if (slug) {
-      u = "https://" + slug + ".obk369369-spec.deno.net/";
-      upInput.value = u;
-    }
-  }
-
   c.upload = u;
-
   scheduleSaveState();
 };
 
-        
+const autoBtn = document.createElement("button");
+autoBtn.className = "small";
+autoBtn.textContent = "자동 수정";
+autoBtn.onclick = () => {
+  // 1) GitHub 비어 있으면 기본값 채우기
+  if (!ghInput.value.trim() && githubBaseValue) {
+    ghInput.value = githubBaseValue + "/";
+  }
 
-        const testBtn = document.createElement("button");
-        testBtn.className = "small primary";
-        testBtn.textContent = "자동 테스트";
-        testBtn.onclick = () => {
-          runSingleTest(
-            name,
-            ghInput,
-            deInput,
-            upInput,
-            stSpan,
-            timeSpan,
-            logArea
-          );
-        };
+  // 2) 업로드 비어 있고, Deno 콘솔 주소가 들어 있으면 업로드 자동 생성
+  if (!upInput.value.trim()) {
+    const d = deInput.value.trim();
+    if (d.startsWith("https://console.deno.com/obk369369-spec/")) {
+      const parts = d.split("/");
+      const slug = parts[parts.length - 1] || parts[parts.length - 2];
+      if (slug) {
+        upInput.value = "https://" + slug + ".obk369369-spec.deno.net/";
+      }
+    }
+  }
+
+  // 3) 값 반영 + 저장 + 테스트 한 번 자동 실행
+  c.github = ghInput.value.trim();
+  c.deno = deInput.value.trim();
+  c.upload = upInput.value.trim();
+  scheduleSaveState();
+
+  runSingleTest(
+    name,
+    ghInput,
+    deInput,
+    upInput,
+    stSpan,
+    timeSpan,
+    logArea
+  );
+};
+
+const testBtn = document.createElement("button");
+testBtn.className = "small primary";
+testBtn.textContent = "자동 테스트";
+testBtn.onclick = () => {
+  runSingleTest(
+    name,
+    ghInput,
+    deInput,
+    upInput,
+    stSpan,
+    timeSpan,
+    logArea
+  );
+};
+
+btnRow.appendChild(saveBtn);
+btnRow.appendChild(autoBtn);
+btnRow.appendChild(testBtn);
+card.appendChild(btnRow);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
 
         btnRow.appendChild(saveBtn);
         btnRow.appendChild(testBtn);
