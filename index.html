@@ -232,16 +232,6 @@
       return new Date().toLocaleTimeString("ko-KR", { hour12: false });
     }
 
-    // 업로드 주소용: http/https 없으면 https:// 붙이기 (GitHub/Deno는 건드리지 않음)
-    function normalizeUploadUrl(u) {
-      u = (u || "").trim();
-      if (!u) return "";
-      if (!/^https?:\/\//i.test(u)) {
-        return "https://" + u;
-      }
-      return u;
-    }
-
     // ----- 저장 / 복원 -----
     function saveState() {
       state.toolListText = document.getElementById("toolList").value;
@@ -350,7 +340,7 @@
 
       const usedNames = [];
 
-      // 화면에 보이는 값에서 바로 읽어서, 모든 카드에 강제 적용
+      // 화면에 보이는 값에서 직접 읽어서 모든 카드에 적용
       const githubBaseRaw = (document.getElementById("githubBase").value || "").trim();
       const denoBaseRaw   = (document.getElementById("denoBase").value   || "").trim();
       const githubBaseValue = githubBaseRaw.replace(/\/+$/, "");
@@ -361,7 +351,7 @@
         usedNames.push(name);
         const c = ensureCard(name);
 
-        // GitHub/Deno 주소를 항상 덮어쓰기 (자동 채움)
+        // GitHub/Deno 주소 자동 채움 (항상 덮어쓰기)
         c.github = githubBaseValue ? githubBaseValue + "/" : "";
         c.deno   = denoBaseValue   ? denoBaseValue   + "/" : "";
 
@@ -424,7 +414,7 @@
         deRow.appendChild(deBtn);
         card.appendChild(deRow);
 
-        // 업로드 주소 입력
+        // 업로드 주소 입력 (현재는 수동 입력 단계 유지)
         const upRow = document.createElement("div");
         upRow.className = "card-row";
         const upInput = document.createElement("input");
@@ -482,7 +472,7 @@
         });
         card.appendChild(errArea);
 
-        // 버튼들 (주소 저장 + 자동 수정 + 자동 테스트)
+        // 버튼들 (주소 저장 + 자동 테스트)
         const btnRow = document.createElement("div");
         btnRow.className = "card-row";
 
@@ -494,28 +484,6 @@
           c.deno = deInput.value.trim();
           c.upload = upInput.value.trim();
           scheduleSaveState();
-        };
-
-        const fixBtn = document.createElement("button");
-        fixBtn.className = "small";
-        fixBtn.textContent = "자동 수정";
-        fixBtn.onclick = () => {
-          // 업로드 주소만 자동 보정
-          const g = ghInput.value.trim();
-          const d = deInput.value.trim();
-          const u = normalizeUploadUrl(upInput.value);
-          ghInput.value = g;
-          deInput.value = d;
-          upInput.value = u;
-
-          c.github = g;
-          c.deno = d;
-          c.upload = u;
-          c.status = "대기";
-          c.log = "자동 수정 실행: " + now();
-          c.last = now();
-          scheduleSaveState();
-          buildCards();
         };
 
         const testBtn = document.createElement("button");
@@ -534,7 +502,6 @@
         };
 
         btnRow.appendChild(saveBtn);
-        btnRow.appendChild(fixBtn);
         btnRow.appendChild(testBtn);
         card.appendChild(btnRow);
 
@@ -569,13 +536,9 @@
     function runSingleTest(name, ghInput, deInput, upInput, statusSpan, timeSpan, logArea) {
       const c = ensureCard(name);
 
-      // 업로드 주소만 자동 보정
       const g = ghInput.value.trim();
       const d = deInput.value.trim();
-      const u = normalizeUploadUrl(upInput.value);
-      ghInput.value = g;
-      deInput.value = d;
-      upInput.value = u;
+      const u = upInput.value.trim();
 
       const r = validateTriple(g, d, u);
 
