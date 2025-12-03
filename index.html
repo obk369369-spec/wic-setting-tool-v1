@@ -558,33 +558,45 @@ saveBtn.onclick = () => {
 
     // ----- 테스트 -----
     function runSingleTest(name, ghInput, deInput, upInput, statusSpan, timeSpan, logArea) {
-      const c = ensureCard(name);
+  const c = ensureCard(name);
 
-      const g = ghInput.value.trim();
-      const d = deInput.value.trim();
-      const u = upInput.value.trim();
+  const g = ghInput.value.trim();
+  const d = deInput.value.trim();
+  let u = upInput.value.trim();
 
-      const r = validateTriple(g, d, u);
-
-      c.github = g;
-      c.deno = d;
-      c.upload = u;
-      c.last = now();
-      c.log = "자동 테스트: " + c.last + " / 결과: " + r.reason;
-
-      if (r.ok) {
-        c.status = "정상";
-        statusSpan.className = "status-ok";
-      } else {
-        c.status = "오류 가능";
-        statusSpan.className = "status-warn";
-      }
-      statusSpan.textContent = "상태: " + c.status;
-      timeSpan.textContent = "(마지막 테스트: " + c.last + ")";
-      logArea.textContent = c.log;
-
-      scheduleSaveState();
+  // 업로드 주소가 비어 있고, Deno 콘솔 주소가 들어가 있으면 자동 생성
+  if (!u && d.startsWith("https://console.deno.com/obk369369-spec/")) {
+    const parts = d.split("/");
+    const slug = parts[parts.length - 1] || parts[parts.length - 2];
+    if (slug) {
+      u = "https://" + slug + ".obk369369-spec.deno.net/";
+      upInput.value = u;
     }
+  }
+
+  const r = validateTriple(g, d, u);
+
+  c.github = g;
+  c.deno = d;
+  c.upload = u;
+  c.last = now();
+  c.log = "자동 테스트: " + c.last + " / 결과: " + r.reason;
+
+  if (r.ok) {
+    c.status = "정상";
+    statusSpan.className = "status-ok";
+  } else {
+    c.status = "오류 가능";
+    statusSpan.className = "status-warn";
+  }
+  statusSpan.textContent = "상태: " + c.status;
+  timeSpan.textContent = "(마지막 테스트: " + c.last + ")";
+  logArea.textContent = c.log;
+
+  scheduleSaveState();
+}
+
+    
 
     function testAll() {
       const cards = document.querySelectorAll(".card");
