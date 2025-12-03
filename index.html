@@ -484,12 +484,31 @@
         const saveBtn = document.createElement("button");
         saveBtn.className = "small";
         saveBtn.textContent = "주소 저장";
-        saveBtn.onclick = () => {
-          c.github = ghInput.value.trim();
-          c.deno = deInput.value.trim();
-          c.upload = upInput.value.trim();
-          scheduleSaveState();
-        };
+saveBtn.onclick = () => {
+  const g = ghInput.value.trim();
+  const d = deInput.value.trim();
+  let u = upInput.value.trim();
+
+  // 기본 저장
+  c.github = g;
+  c.deno = d;
+
+  // 업로드 주소가 비어 있고, Deno 콘솔 주소가 들어가 있으면 자동 생성
+  if (!u && d.startsWith("https://console.deno.com/obk369369-spec/")) {
+    const parts = d.split("/");
+    const slug = parts[parts.length - 1] || parts[parts.length - 2]; // .../07-wic-setting-tool-v1
+    if (slug) {
+      u = "https://" + slug + ".obk369369-spec.deno.net/";
+      upInput.value = u;
+    }
+  }
+
+  c.upload = u;
+
+  scheduleSaveState();
+};
+
+        
 
         const testBtn = document.createElement("button");
         testBtn.className = "small primary";
