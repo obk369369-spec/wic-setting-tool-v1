@@ -1,610 +1,395 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>7번 세팅 도구 - WIC Tool Setting Manager</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>7번 세팅 도구 · WIC Auto Tools Setup Center</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    :root {
-      --bg: #f4f5f7;
-      --card: #ffffff;
-      --accent: #1f6feb;
-      --accent-soft: #e0ecff;
-      --border: #d0d7de;
-      --text: #24292f;
-      --muted: #6e7781;
-      --danger: #d73a49;
-      --success: #2da44e;
-      --radius-lg: 14px;
-      --radius-sm: 8px;
-    }
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      background: #f5f5f7;
+      color: #222;
     }
     header {
-      padding: 12px 20px;
-      background: #0d1117;
-      color: #f0f6fc;
+      padding: 16px 24px;
+      background: #111827;
+      color: #f9fafb;
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
     header h1 {
-      font-size: 18px;
       margin: 0;
+      font-size: 20px;
     }
-    header span {
+    header .subtitle {
       font-size: 12px;
-      color: #8b949e;
+      opacity: 0.8;
     }
-    .badge {
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 11px;
-      border: 1px solid #30363d;
-      background: #161b22;
+    .layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: calc(100vh - 64px);
     }
-    main {
-      display: flex;
-      height: calc(100vh - 52px);
+    nav {
+      background: #ffffff;
+      border-right: 1px solid #e5e7eb;
+      padding: 16px;
     }
-    .sidebar {
-      width: 260px;
-      border-right: 1px solid var(--border);
-      padding: 14px 10px;
-      background: #f8fafc;
-      overflow-y: auto;
-    }
-    .sidebar h2 {
+    nav h2 {
       font-size: 14px;
       margin: 0 0 8px;
     }
-    .tool-item {
+    .nav-section {
+      margin-bottom: 24px;
+    }
+    .nav-link {
+      display: block;
       padding: 8px 10px;
       margin-bottom: 4px;
-      border-radius: var(--radius-sm);
+      border-radius: 6px;
+      font-size: 13px;
+      text-decoration: none;
+      color: #111827;
+      cursor: default;
+    }
+    .nav-link.active {
+      background: #111827;
+      color: #f9fafb;
+      font-weight: 600;
+    }
+    .nav-link.muted {
+      color: #6b7280;
+    }
+    main {
+      padding: 16px 20px 24px;
+      overflow: auto;
+    }
+    .section-title {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      cursor: pointer;
-      border: 1px solid transparent;
-      font-size: 13px;
+      margin-bottom: 12px;
     }
-    .tool-item span.name {
-      flex: 1;
-      margin-right: 4px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    .section-title h2 {
+      font-size: 16px;
+      margin: 0;
     }
-    .tool-item span.status {
+    .section-title small {
       font-size: 11px;
-      padding: 2px 6px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: #ffffff;
+      color: #6b7280;
     }
-    .tool-item.active {
-      border-color: var(--accent);
-      background: var(--accent-soft);
-    }
-    .tool-item.active span.status {
-      border-color: var(--accent);
-    }
-    .tool-item[data-state="not_started"] span.status {
-      color: var(--muted);
-    }
-    .tool-item[data-state="in_progress"] span.status {
-      color: #b08800;
-      border-color: #b08800;
-    }
-    .tool-item[data-state="done"] span.status {
-      color: var(--success);
-      border-color: var(--success);
-    }
-
-    .content {
-      flex: 1;
-      padding: 16px 18px;
-      overflow-y: auto;
-    }
-    .grid {
+    .card-row {
       display: grid;
-      grid-template-columns: 1.4fr 1fr;
-      gap: 14px;
-      margin-bottom: 14px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
     }
     .card {
-      background: var(--card);
-      border-radius: var(--radius-lg);
-      padding: 14px 16px;
-      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
-      border: 1px solid var(--border);
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 12px 14px;
+      border: 1px solid #e5e7eb;
     }
-    .card h3 {
-      margin: 0 0 8px;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .card h3 span.sub {
+    .card-label {
       font-size: 11px;
-      color: var(--muted);
-      font-weight: 400;
+      color: #6b7280;
+      margin-bottom: 4px;
     }
-    label {
-      display: block;
-      font-size: 12px;
-      margin-bottom: 3px;
-      color: var(--muted);
+    .card-value {
+      font-size: 20px;
+      font-weight: 600;
     }
-    input[type="text"],
-    input[type="url"],
-    select,
-    textarea {
-      width: 100%;
-      padding: 6px 8px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      font-size: 12px;
-      outline: none;
+    .card-meta {
+      margin-top: 4px;
+      font-size: 11px;
+      color: #9ca3af;
     }
-    textarea {
-      resize: vertical;
-      min-height: 52px;
-    }
-    input:focus,
-    select:focus,
-    textarea:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px var(--accent-soft);
-    }
-    .field-row {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-    .field {
-      margin-bottom: 8px;
-    }
-    .btn-row {
+    .toolbar {
       display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
       gap: 8px;
-      margin-top: 8px;
       flex-wrap: wrap;
     }
-    button {
+    .toolbar-left, .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      border: 1px solid #d1d5db;
+      background: #ffffff;
       border-radius: 999px;
-      border: 1px solid transparent;
       font-size: 12px;
       padding: 6px 12px;
       cursor: pointer;
-      background: var(--accent);
-      color: #ffffff;
     }
-    button.secondary {
-      background: #ffffff;
-      color: var(--text);
-      border-color: var(--border);
+    .btn-primary {
+      background: #111827;
+      border-color: #111827;
+      color: #f9fafb;
+      font-weight: 500;
     }
-    button.danger {
-      background: var(--danger);
-    }
-    button:disabled {
-      opacity: 0.5;
-      cursor: default;
-    }
-    .status-pill {
-      padding: 3px 10px;
-      border-radius: 999px;
+    .btn-small {
       font-size: 11px;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      background: #f8fafc;
+      padding: 4px 8px;
     }
-    .status-pill.ok {
-      border-color: var(--success);
-      color: var(--success);
-      background: #e6f6ec;
-    }
-    .status-pill.fail {
-      border-color: var(--danger);
-      color: var(--danger);
-      background: #ffeef0;
+    .input {
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      min-width: 160px;
     }
     table {
       width: 100%;
       border-collapse: collapse;
       font-size: 12px;
+      background: #ffffff;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid #e5e7eb;
+    }
+    thead {
+      background: #f3f4f6;
     }
     th, td {
-      border-bottom: 1px solid var(--border);
-      padding: 6px 4px;
+      padding: 8px 10px;
+      border-bottom: 1px solid #e5e7eb;
       text-align: left;
+      vertical-align: middle;
     }
     th {
+      font-weight: 600;
       font-size: 11px;
-      color: var(--muted);
-      font-weight: 500;
+      color: #4b5563;
     }
-    .log-box {
-      background: #0d1117;
-      color: #f0f6fc;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 11px;
-      padding: 8px 10px;
-      border-radius: 10px;
-      margin-top: 6px;
-      max-height: 130px;
-      overflow-y: auto;
-      white-space: pre-wrap;
+    tr:last-child td {
+      border-bottom: none;
     }
-    .footer-metrics {
-      display: flex;
-      gap: 10px;
+    .badge {
+      display: inline-flex;
       align-items: center;
-      flex-wrap: wrap;
-      margin-top: 4px;
-      font-size: 11px;
-      color: var(--muted);
-    }
-    .chip {
-      padding: 3px 8px;
+      padding: 2px 8px;
       border-radius: 999px;
-      border: 1px solid var(--border);
+      font-size: 10px;
+    }
+    .badge-ok {
+      background: #ecfdf3;
+      color: #15803d;
+    }
+    .badge-warn {
+      background: #fffbeb;
+      color: #92400e;
+    }
+    .badge-error {
+      background: #fef2f2;
+      color: #b91c1c;
+    }
+    .link {
+      font-size: 11px;
+      color: #2563eb;
+      text-decoration: none;
+    }
+    .link-muted {
+      color: #9ca3af;
+    }
+    .split {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .panel {
       background: #ffffff;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      font-size: 12px;
     }
-    .chip strong {
-      margin-right: 4px;
+    .panel h3 {
+      margin: 0 0 8px;
+      font-size: 13px;
     }
-    @media (max-width: 960px) {
-      main {
-        flex-direction: column;
-      }
-      .sidebar {
-        width: 100%;
-        height: 170px;
-        border-right: none;
-        border-bottom: 1px solid var(--border);
-      }
-      .content {
-        height: calc(100vh - 52px - 170px);
-      }
-      .grid {
-        grid-template-columns: 1fr;
-      }
+    .panel small {
+      font-size: 11px;
+      color: #6b7280;
+    }
+    .log-list {
+      margin-top: 6px;
+      max-height: 180px;
+      overflow: auto;
+    }
+    .log-item {
+      font-size: 11px;
+      padding: 4px 0;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .log-item:last-child {
+      border-bottom: none;
     }
   </style>
 </head>
 <body>
-<header>
-  <div>
-    <h1>7번 세팅 도구 · Tool Setting Manager</h1>
-    <span>각 도구의 플랫폼 세팅 · 진행 상태 · 자동 테스트 · 자동 수정 관리</span>
-  </div>
-  <div class="badge">WIC Auto-Tools · v7-setup</div>
-</header>
-
-<main>
-  <aside class="sidebar" id="sidebar">
-    <h2>도구 목록 (요약)</h2>
-    <!-- 도구 리스트는 JS로 렌더링 -->
-  </aside>
-
-  <section class="content">
-    <div class="grid">
-      <!-- 왼쪽: 선택 도구 세팅 -->
-      <div class="card">
-        <h3>
-          <span id="toolTitle">도구를 선택하세요</span>
-          <span class="sub" id="toolKeyLabel"></span>
-        </h3>
-
-        <div class="field-row">
-          <div class="field">
-            <label for="platformType">플랫폼 종류</label>
-            <select id="platformType">
-              <option value="">선택...</option>
-              <option value="deno">Deno Deploy</option>
-              <option value="github">GitHub Pages</option>
-              <option value="local">로컬 서버</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="toolState">도구 상태</label>
-            <select id="toolState">
-              <option value="not_started">미시작</option>
-              <option value="in_progress">진행중</option>
-              <option value="done">완료</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="field">
-          <label for="repoUrl">코드 저장소 주소 (GitHub 등)</label>
-          <input type="url" id="repoUrl" placeholder="https://github.com/…/tool-7-setup">
-        </div>
-
-        <div class="field">
-          <label for="deployUrl">배포 주소 (사용자가 접속하는 주소)</label>
-          <input type="url" id="deployUrl" placeholder="https://7-setup.obk369369-spec.deno.net/">
-        </div>
-
-        <div class="field">
-          <label for="notes">세팅 메모 (필요한 준비물, 남은 일 등)</label>
-          <textarea id="notes" placeholder="예: index.html 교체 필요, 자동 테스트 버튼 실제 기능 연결 예정 등"></textarea>
-        </div>
-
-        <div class="btn-row">
-          <button id="btnSave">현재 도구 세팅 임시 저장</button>
-          <button class="secondary" id="btnClear">입력 내용 초기화</button>
-        </div>
-
-        <div class="footer-metrics">
-          <div class="chip"><strong>도구 상태:</strong> <span id="summaryState">선택 안됨</span></div>
-          <div class="chip"><strong>플랫폼:</strong> <span id="summaryPlatform">-</span></div>
-        </div>
-      </div>
-
-      <!-- 오른쪽: 자동 테스트 / 자동 수정 / 로그 -->
-      <div class="card">
-        <h3>
-          자동 테스트 · 자동 수정
-          <span class="sub">실제 연결 전, 흐름만 화면에서 먼저 확인</span>
-        </h3>
-
-        <div class="field-row">
-          <div class="field">
-            <label>마지막 테스트 결과</label>
-            <div id="testStatus" class="status-pill">대기 중</div>
-          </div>
-          <div class="field">
-            <label>자동 수정 상태</label>
-            <div id="fixStatus" class="status-pill">대기 중</div>
-          </div>
-        </div>
-
-        <div class="btn-row">
-          <button id="btnRunTest">자동 테스트 실행 (가상)</button>
-          <button id="btnRunFix" class="secondary">자동 수정 플랜 생성</button>
-          <button id="btnResetStatus" class="secondary">상태 초기화</button>
-        </div>
-
-        <label style="margin-top:10px;">실행 로그</label>
-        <div class="log-box" id="logBox">
-          [안내] 도구를 선택한 뒤, 자동 테스트 / 자동 수정 버튼을 눌러 흐름을 확인하세요.
-        </div>
-      </div>
+  <header>
+    <div>
+      <h1>7번 세팅 도구 · Setup & Monitor Center</h1>
+      <div class="subtitle">각 도구의 플랫폼 세팅 / 자동 테스트 / 자동 수정 상태를 한 화면에서 관리</div>
     </div>
+    <div class="subtitle">
+      엔진 상태: <strong>대기</strong> · 마지막 갱신: --:--
+    </div>
+  </header>
 
-    <!-- 아래: 6단계 절차 요약 (목록/상세/관리자 역할 겸용) -->
-    <div class="card">
-      <h3>
-        7번 세팅 도구 · 공통 절차 6단계 진행표
-        <span class="sub">각 단계의 진행 상황을 직접 표시</span>
-      </h3>
+  <div class="layout">
+    <nav>
+      <div class="nav-section">
+        <h2>메인 메뉴</h2>
+        <a class="nav-link active">도구 상태 대시보드</a>
+        <a class="nav-link muted">오류 로그 모아보기</a>
+        <a class="nav-link muted">자동 테스트·자동 수정 설정</a>
+      </div>
+
+      <div class="nav-section">
+        <h2>요약 상태</h2>
+        <div class="card" style="padding:8px 10px;">
+          <div class="card-label">도구 개수</div>
+          <div class="card-value" style="font-size:16px;">20</div>
+          <div class="card-meta">완료: 0 · 경고: 0 · 오류: 0</div>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <h2>도움말</h2>
+        <p style="font-size:11px; color:#6b7280; margin:0;">
+          이 화면은 각 도구의<br />
+          · GitHub/배포 주소<br />
+          · 자동 테스트 버튼<br />
+          · 오류 상태 요약<br />
+          을 한 번에 확인·관리하는<br />
+          전용 세팅 도구입니다.
+        </p>
+      </div>
+    </nav>
+
+    <main>
+      <div class="section-title">
+        <h2>도구별 세팅 및 상태</h2>
+        <small>※ 아직은 예시 데이터만 보이며, 실제 동작은 다음 단계에서 연결됩니다.</small>
+      </div>
+
+      <div class="card-row">
+        <div class="card">
+          <div class="card-label">전체 도구 상태</div>
+          <div class="card-value">정상 0 / 점검 필요 0</div>
+          <div class="card-meta">자동 테스트 결과가 여기 요약됩니다.</div>
+        </div>
+        <div class="card">
+          <div class="card-label">마지막 전체 자동 테스트</div>
+          <div class="card-value">-</div>
+          <div class="card-meta">테스트 실행 후 시간과 결과가 표시됩니다.</div>
+        </div>
+        <div class="card">
+          <div class="card-label">복잡 오류 개수</div>
+          <div class="card-value">0</div>
+          <div class="card-meta">자동 수정이 어려운 오류 수를 모아서 보여줍니다.</div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <input class="input" type="text" placeholder="도구 이름 또는 번호 검색" />
+          <button class="btn btn-small">필터: 모든 상태</button>
+        </div>
+        <div class="toolbar-right">
+          <button class="btn">선택 도구 자동 테스트</button>
+          <button class="btn btn-primary">전체 자동 테스트 실행</button>
+        </div>
+      </div>
+
       <table>
         <thead>
           <tr>
-            <th style="width:22%;">단계</th>
-            <th style="width:40%;">내용</th>
-            <th style="width:18%;">상태</th>
-            <th style="width:20%;">비고</th>
+            <th style="width:40px;">#</th>
+            <th style="width:160px;">도구 이름</th>
+            <th style="width:90px;">상태</th>
+            <th>코드 저장소 주소</th>
+            <th>배포 주소</th>
+            <th style="width:110px;">마지막 테스트</th>
+            <th style="width:140px;">동작</th>
           </tr>
         </thead>
-        <tbody id="stepTableBody">
-          <!-- JS로 렌더링 -->
+        <tbody>
+          <!-- 예시 행: 실제 데이터는 다음 단계에서 채워짐 -->
+          <tr>
+            <td>1</td>
+            <td>1번 고객 자동화 안내서</td>
+            <td><span class="badge badge-warn">미연결</span></td>
+            <td><a href="#" class="link link-muted">https://github.com/…/tool-1</a></td>
+            <td><a href="#" class="link link-muted">https://1-guide.…deno.net/</a></td>
+            <td>-</td>
+            <td>
+              <button class="btn btn-small">자동 테스트</button>
+              <button class="btn btn-small">오류 보기</button>
+            </td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td>7번 세팅 도구</td>
+            <td><span class="badge badge-ok">정상</span></td>
+            <td><a href="#" class="link link-muted">https://github.com/…/tool-7-setup</a></td>
+            <td><a href="#" class="link link-muted">https://7-setup.…deno.net/</a></td>
+            <td>-</td>
+            <td>
+              <button class="btn btn-small">자동 테스트</button>
+              <button class="btn btn-small">오류 보기</button>
+            </td>
+          </tr>
+          <tr>
+            <td>20</td>
+            <td>20번 운영 매뉴얼</td>
+            <td><span class="badge badge-error">오류</span></td>
+            <td><a href="#" class="link link-muted">https://github.com/…/tool-20-manual</a></td>
+            <td><a href="#" class="link link-muted">https://20-manual.…deno.net/</a></td>
+            <td>테스트 실패</td>
+            <td>
+              <button class="btn btn-small">자동 테스트</button>
+              <button class="btn btn-small">오류 보기</button>
+            </td>
+          </tr>
         </tbody>
       </table>
-    </div>
-  </section>
-</main>
 
-<script>
-  // 7번 세팅 도구에서 관리할 도구 목록 (요약)
-  const tools = [
-    { key: "tool-1",   name: "1번 고객 자동화 안내서",            state: "in_progress" },
-    { key: "tool-2",   name: "2번 입찰·전자조달 자동화 도구",      state: "not_started" },
-    { key: "tool-3",   name: "3번 코딩 기초 연습 도구",            state: "in_progress" },
-    { key: "tool-4-5", name: "4+5 연구비·보고서 생성 도구",       state: "in_progress" },
-    { key: "tool-7",   name: "7번 세팅 도구 (현재)",              state: "in_progress" },
-    { key: "tool-8",   name: "8번 동사 활용 도구",                state: "not_started" },
-    { key: "tool-9",   name: "9번 컨텐츠 자료 안내 도구",         state: "not_started" },
-    { key: "tool-10",  name: "10번 재무 회계 프로그램",           state: "not_started" },
-    { key: "tool-11",  name: "11번 재테크 프로그램",              state: "not_started" },
-    { key: "tool-12",  name: "12번 서브 웹사이트 제작 도구",      state: "not_started" },
-    { key: "tool-13",  name: "13번 엑셀 자동 업로드 도구",        state: "not_started" },
-    { key: "tool-14",  name: "14번 홈페이지 수정 프로그램",       state: "not_started" },
-    { key: "tool-15",  name: "15번 공통엔진 모듈 테스트기",       state: "not_started" },
-    { key: "tool-18",  name: "18번 도구 정책 기능 도구",          state: "not_started" },
-    { key: "tool-19",  name: "19번 사업장 홍보 프로그램",         state: "not_started" },
-    { key: "tool-20",  name: "20번 운영 매뉴얼 디스플레이",       state: "not_started" },
-    { key: "tool-21",  name: "21번 영업 도우미",                  state: "not_started" },
-    { key: "tool-22",  name: "22번 공통 준비물 도구",             state: "not_started" },
-    { key: "tool-23",  name: "23번 월드 어드바이저",              state: "not_started" },
-    { key: "tool-24",  name: "24번 동영상 제작 도구",             state: "not_started" },
-    { key: "tool-25",  name: "25번 월드 무료 자료 생성 도구",     state: "not_started" }
-  ];
+      <div class="split">
+        <div class="panel">
+          <h3>도구별 자동 테스트·자동 수정 요약</h3>
+          <small>※ 여기에는 “자동으로 고칠 수 있는 오류”와 “사용자 선택이 필요한 오류”가 요약됩니다.</small>
+          <div class="log-list">
+            <div class="log-item">
+              [예시] 20번 운영 매뉴얼 · 링크 깨짐 2건 · 자동 수정 가능 · 상태: <span class="badge badge-warn">검토 필요</span>
+            </div>
+            <div class="log-item">
+              [예시] 14번 홈페이지 수정 · CSS 충돌 · 자동 수정 난이도: 높음 · 상태: <span class="badge badge-error">복잡 오류</span>
+            </div>
+          </div>
+        </div>
 
-  const steps = [
-    { id: 1, name: "① 화면 뼈대 제작", desc: "index.html 화면 기본 레이아웃 구성" },
-    { id: 2, name: "② 화면 테스트 1회", desc: "브라우저에서 화면 열기·클릭 확인" },
-    { id: 3, name: "③ 개별 기능 추가", desc: "세팅 저장 / 자동 테스트 / 자동 수정 버튼 연결" },
-    { id: 4, name: "④ 목록 화면 제작", desc: "도구 전체 목록·상태 요약 화면" },
-    { id: 5, name: "⑤ 상세 화면 연결", desc: "도구 선택 시 세부 세팅 화면 연결" },
-    { id: 6, name: "⑥ 관리자 화면 제작", desc: "6단계 진행표·로그·상태 관리 화면" }
-  ];
-
-  const sidebar = document.getElementById("sidebar");
-  const toolTitle = document.getElementById("toolTitle");
-  const toolKeyLabel = document.getElementById("toolKeyLabel");
-  const platformType = document.getElementById("platformType");
-  const toolState = document.getElementById("toolState");
-  const repoUrl = document.getElementById("repoUrl");
-  const deployUrl = document.getElementById("deployUrl");
-  const notes = document.getElementById("notes");
-  const summaryState = document.getElementById("summaryState");
-  const summaryPlatform = document.getElementById("summaryPlatform");
-  const btnSave = document.getElementById("btnSave");
-  const btnClear = document.getElementById("btnClear");
-  const btnRunTest = document.getElementById("btnRunTest");
-  const btnRunFix = document.getElementById("btnRunFix");
-  const btnResetStatus = document.getElementById("btnResetStatus");
-  const testStatus = document.getElementById("testStatus");
-  const fixStatus = document.getElementById("fixStatus");
-  const logBox = document.getElementById("logBox");
-  const stepTableBody = document.getElementById("stepTableBody");
-
-  let currentToolKey = null;
-
-  function renderToolList() {
-    tools.forEach(tool => {
-      const div = document.createElement("div");
-      div.className = "tool-item";
-      div.dataset.key = tool.key;
-      div.dataset.state = tool.state;
-      div.innerHTML = `
-        <span class="name">${tool.name}</span>
-        <span class="status">${
-          tool.state === "done" ? "완료" :
-          tool.state === "in_progress" ? "진행중" : "미시작"
-        }</span>
-      `;
-      div.addEventListener("click", () => selectTool(tool.key));
-      sidebar.appendChild(div);
-    });
-  }
-
-  function renderSteps() {
-    stepTableBody.innerHTML = "";
-    steps.forEach(step => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${step.name}</td>
-        <td>${step.desc}</td>
-        <td>
-          <select data-step-id="${step.id}" class="step-state">
-            <option value="not_started">미시작</option>
-            <option value="in_progress">진행중</option>
-            <option value="done">완료</option>
-          </select>
-        </td>
-        <td><input type="text" class="step-note" data-step-id="${step.id}" placeholder="메모"></td>
-      `;
-      stepTableBody.appendChild(tr);
-    });
-  }
-
-  function selectTool(key) {
-    currentToolKey = key;
-    const tool = tools.find(t => t.key === key);
-    document.querySelectorAll(".tool-item").forEach(el => {
-      el.classList.toggle("active", el.dataset.key === key);
-    });
-    toolTitle.textContent = tool.name;
-    toolKeyLabel.textContent = key;
-
-    toolState.value = tool.state;
-    summaryState.textContent =
-      tool.state === "done" ? "완료" :
-      tool.state === "in_progress" ? "진행중" : "미시작";
-
-    summaryPlatform.textContent = platformType.value || "-";
-
-    // 선택 도구 변경 시, 테스트/수정 상태는 유지하되 로그에 기록
-    appendLog(`[도구 선택] ${tool.name} (${key}) 선택됨.`);
-  }
-
-  function appendLog(message) {
-    const now = new Date();
-    const time = now.toLocaleTimeString("ko-KR", { hour12: false });
-    logBox.textContent += `\n[${time}] ${message}`;
-    logBox.scrollTop = logBox.scrollHeight;
-  }
-
-  btnSave.addEventListener("click", () => {
-    if (!currentToolKey) {
-      appendLog("[경고] 먼저 도구를 선택하세요.");
-      return;
-    }
-    const tool = tools.find(t => t.key === currentToolKey);
-    tool.state = toolState.value;
-
-    // 사이드바 상태 뱃지 갱신
-    document.querySelectorAll(".tool-item").forEach(el => {
-      if (el.dataset.key === currentToolKey) {
-        el.dataset.state = tool.state;
-        const statusSpan = el.querySelector(".status");
-        statusSpan.textContent =
-          tool.state === "done" ? "완료" :
-          tool.state === "in_progress" ? "진행중" : "미시작";
-      }
-    });
-
-    summaryState.textContent =
-      tool.state === "done" ? "완료" :
-      tool.state === "in_progress" ? "진행중" : "미시작";
-
-    summaryPlatform.textContent = platformType.value || "-";
-
-    appendLog(`[세팅 저장] ${tool.name} 상태=${summaryState.textContent}, 플랫폼=${summaryPlatform.textContent}, repo=${repoUrl.value}, deploy=${deployUrl.value}`);
-  });
-
-  btnClear.addEventListener("click", () => {
-    platformType.value = "";
-    repoUrl.value = "";
-    deployUrl.value = "";
-    notes.value = "";
-    appendLog("[초기화] 세팅 입력값 초기화.");
-  });
-
-  btnRunTest.addEventListener("click", () => {
-    if (!currentToolKey) {
-      appendLog("[경고] 테스트 전에 도구를 먼저 선택하세요.");
-      return;
-    }
-    testStatus.textContent = "테스트 완료 (가상)";
-    testStatus.classList.remove("fail");
-    testStatus.classList.add("ok");
-    appendLog("[테스트] 화면 뼈대·버튼·입력 필드가 시각적으로 확인됨 (가상 테스트).");
-  });
-
-  btnRunFix.addEventListener("click", () => {
-    if (!currentToolKey) {
-      appendLog("[경고] 자동 수정을 실행하려면 도구를 먼저 선택하세요.");
-      return;
-    }
-    fixStatus.textContent = "수정 플랜 생성됨";
-    fixStatus.classList.remove("fail");
-    fixStatus.classList.add("ok");
-    appendLog("[자동 수정] 실제 코드 수정 전에, 수정 계획(예: API 연결, 실제 배포 스크립트 추가 등)을 문서로 먼저 작성하도록 안내.");
-  });
-
-  btnResetStatus.addEventListener("click", () => {
-    testStatus.textContent = "대기 중";
-    testStatus.classList.remove("ok", "fail");
-    fixStatus.textContent = "대기 중";
-    fixStatus.classList.remove("ok", "fail");
-    appendLog("[상태 초기화] 테스트/자동 수정 상태 초기화.");
-  });
-
-  platformType.addEventListener("change", () => {
-    summaryPlatform.textContent = platformType.value || "-";
-  });
-
-  // 초기 렌더링
-  renderToolList();
-  renderSteps();
-  // 기본 선택: 7번 도구
-  selectTool("tool-7");
-</script>
+        <div class="panel">
+          <h3>복잡 오류 · 선택 옵션 안내</h3>
+          <small>※ 복잡한 오류는 “자동 수정 시도 / 패치 코드만 보기 / 수동 처리로 넘기기” 같은 선택지를 제공합니다.</small>
+          <div class="log-list">
+            <div class="log-item">
+              [예시] 복잡 오류가 발견되면 여기에서 요약과 함께 선택 옵션이 표시됩니다.
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
 </body>
 </html>
