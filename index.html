@@ -218,8 +218,34 @@
     <div id="cardsContainer" class="cards-grid"></div>
   </div>
 
+
+
+
   <script>
     const STORAGE_KEY = "wic_setup_tool_v2_state";
+
+    // 🔹 처음 들어올 때 자동으로 채워 넣을 기본 값(프리셋)
+    const DEFAULT_TOOL_LIST = [
+      "1번 고객 자동화 안내서",
+      "2번 입찰 프로그램",
+      "3번 코딩 기초 연습 뼈대",
+      "4번 연구비 박사 엑셀 생성기",
+      "5번 보고서 생성기",
+      "7번 세팅 도구",
+      "8번 동사 활용 도구",
+      "9번 컨텐츠 자료 안내 도구",
+      "10번 재무 회계 프로그램",
+      "11번 재테크 프로그램",
+      "12번 서브 웹사이트 제작",
+      "13번 엑셀 자동 업로드",
+      "14번 홈페이지 수정 프로그램",
+      "15번 공통엔진 모듈 테스트기",
+      "18번 Tool Policy 도구 기능 정책",
+      "19번 사업장 홍보 프로그램"
+    ].join("\n");
+
+    const DEFAULT_GITHUB_BASE = "https://github.com/obk369369-spec";
+    const DEFAULT_DENO_BASE = "https://dash.deno.com/projects";
 
     let state = {
       toolListText: "",
@@ -258,18 +284,44 @@
 
     function loadState() {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return;
+      const toolListEl = document.getElementById("toolList");
+      const githubBaseEl = document.getElementById("githubBase");
+      const denoBaseEl = document.getElementById("denoBase");
+
+      if (!raw) {
+        // 🔹 처음 들어온 경우: 기본 값 자동 채우기 + 카드 자동 생성
+        toolListEl.value = DEFAULT_TOOL_LIST;
+        githubBaseEl.value = DEFAULT_GITHUB_BASE;
+        denoBaseEl.value = DEFAULT_DENO_BASE;
+        state.toolListText = DEFAULT_TOOL_LIST;
+        state.githubBase = DEFAULT_GITHUB_BASE;
+        state.denoBase = DEFAULT_DENO_BASE;
+        state.cards = [];
+        buildCards();
+        saveState();
+        return;
+      }
+
       try {
         const obj = JSON.parse(raw);
         if (obj && typeof obj === "object") {
           state = Object.assign(state, obj);
-          document.getElementById("toolList").value = state.toolListText || "";
-          document.getElementById("githubBase").value = state.githubBase || "";
-          document.getElementById("denoBase").value = state.denoBase || "";
+          toolListEl.value = state.toolListText || DEFAULT_TOOL_LIST;
+          githubBaseEl.value = state.githubBase || DEFAULT_GITHUB_BASE;
+          denoBaseEl.value = state.denoBase || DEFAULT_DENO_BASE;
         }
       } catch (_) {
-        // 무시
+        // 복원 실패 시에도 기본 값으로 채워서 시작
+        toolListEl.value = DEFAULT_TOOL_LIST;
+        githubBaseEl.value = DEFAULT_GITHUB_BASE;
+        denoBaseEl.value = DEFAULT_DENO_BASE;
+        state.toolListText = DEFAULT_TOOL_LIST;
+        state.githubBase = DEFAULT_GITHUB_BASE;
+        state.denoBase = DEFAULT_DENO_BASE;
       }
+
+      // 🔹 저장된 값이 있든 없든, 로드 후에는 항상 카드 생성
+      buildCards();
     }
 
     // ----- 카드 상태 -----
@@ -340,7 +392,6 @@
 
       const usedNames = [];
 
-      // 화면에 보이는 입력값을 직접 읽어 사용
       const githubBaseValue = (document.getElementById("githubBase").value || "").replace(/\/+$/, "");
       const denoBaseValue   = (document.getElementById("denoBase").value   || "").replace(/\/+$/, "");
 
@@ -349,7 +400,6 @@
         usedNames.push(name);
         const c = ensureCard(name);
 
-        // GitHub/Deno 자동 기본값 세팅 (비어 있을 때만)
         if (!c.github && githubBaseValue) {
           c.github = githubBaseValue + "/";
         }
@@ -361,7 +411,6 @@
         card.className = "card";
         card.dataset.name = name;
 
-        // 헤더
         const header = document.createElement("div");
         header.className = "card-header";
         const title = document.createElement("div");
@@ -374,13 +423,11 @@
         header.appendChild(chip);
         card.appendChild(header);
 
-        // 설명
         const desc = document.createElement("div");
         desc.className = "card-desc";
         desc.textContent = "기능 요약: " + name;
         card.appendChild(desc);
 
-        // GitHub 입력
         const ghRow = document.createElement("div");
         ghRow.className = "card-row";
         const ghInput = document.createElement("input");
@@ -398,7 +445,6 @@
         ghRow.appendChild(ghBtn);
         card.appendChild(ghRow);
 
-        // Deno 입력
         const deRow = document.createElement("div");
         deRow.className = "card-row";
         const deInput = document.createElement("input");
@@ -416,7 +462,6 @@
         deRow.appendChild(deBtn);
         card.appendChild(deRow);
 
-        // 업로드 주소 입력
         const upRow = document.createElement("div");
         upRow.className = "card-row";
         const upInput = document.createElement("input");
@@ -434,7 +479,6 @@
         upRow.appendChild(upBtn);
         card.appendChild(upRow);
 
-        // 상태 표시
         const statusLine = document.createElement("div");
         const stSpan = document.createElement("span");
         const statusLabel = c.status || "대기";
@@ -454,7 +498,6 @@
         statusLine.appendChild(timeSpan);
         card.appendChild(statusLine);
 
-        // 오류 선택지
         const errArea = document.createElement("div");
         errArea.className = "small-text";
         errArea.textContent = "오류 시 선택지:";
@@ -474,7 +517,6 @@
         });
         card.appendChild(errArea);
 
-        // 버튼들 (주소 저장 + 자동 수정 + 자동 테스트)
         const btnRow = document.createElement("div");
         btnRow.className = "card-row";
 
@@ -522,13 +564,11 @@
         btnRow.appendChild(testBtn);
         card.appendChild(btnRow);
 
-        // 로그
         const logArea = document.createElement("div");
         logArea.className = "log";
         logArea.textContent = c.log || "로그: 아직 없음";
         card.appendChild(logArea);
 
-        // 카드 입력값 자동 저장
         ghInput.addEventListener("input", () => {
           c.github = ghInput.value.trim();
           scheduleSaveState();
@@ -604,17 +644,18 @@
         denoBase: "",
         cards: []
       };
-      document.getElementById("toolList").value = "";
-      document.getElementById("githubBase").value = "";
-      document.getElementById("denoBase").value = "";
+      document.getElementById("toolList").value = DEFAULT_TOOL_LIST;
+      document.getElementById("githubBase").value = DEFAULT_GITHUB_BASE;
+      document.getElementById("denoBase").value = DEFAULT_DENO_BASE;
       document.getElementById("cardsContainer").innerHTML = "";
-      document.getElementById("autosaveStatus").textContent = "초기화 완료";
+      document.getElementById("autosaveStatus").textContent = "초기화 완료 (기본 프리셋 적용)";
+      buildCards();
+      saveState();
     }
 
     // ----- 초기화 -----
     document.addEventListener("DOMContentLoaded", () => {
       loadState();
-      buildCards();
 
       document.getElementById("buildCardsBtn").onclick = () => {
         buildCards();
@@ -639,5 +680,10 @@
       });
     });
   </script>
+
+
+
+
+  
 </body>
 </html>
