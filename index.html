@@ -3,243 +3,416 @@
 <head>
   <meta charset="UTF-8" />
   <title>7번 세팅 도구 · Setup & Monitor Center</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body { font-family: sans-serif; max-width: 960px; margin: 0 auto; padding: 16px; }
-    h1 { font-size: 20px; margin-bottom: 4px; }
-    h2 { font-size: 16px; margin-top: 16px; }
-    .card { border: 1px solid #ccc; border-radius: 8px; padding: 12px; margin-top: 8px; }
-    .row { display: flex; flex-wrap: wrap; gap: 12px; }
-    .row > div { min-width: 140px; }
-    button { padding: 6px 10px; margin: 4px 0; cursor: pointer; }
-    table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px; }
-    th, td { border: 1px solid #ddd; padding: 4px 6px; text-align: left; }
-    th { background: #f5f5f5; }
-    .badge { display: inline-block; padding: 2px 6px; border-radius: 10px; font-size: 11px; }
-    .badge-ok { background: #e0f7e9; }
-    .badge-warn { background: #fff4d8; }
-    .badge-err { background: #ffe0e0; }
-    #paste-panel { margin-top: 8px; display: none; }
-    #toolText { width: 100%; height: 120px; font-family: monospace; font-size: 12px; }
-    small { color: #666; }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5;
+      color: #222;
+    }
+    header {
+      background: #1f2933;
+      color: #fff;
+      padding: 16px 20px;
+    }
+    header h1 {
+      margin: 0 0 4px 0;
+      font-size: 20px;
+    }
+    header p {
+      margin: 0;
+      font-size: 13px;
+      opacity: 0.85;
+    }
+    main {
+      padding: 16px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+    }
+    .card h2 {
+      margin: 0 0 8px 0;
+      font-size: 18px;
+    }
+    .card small {
+      font-size: 12px;
+      color: #6b7280;
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+      align-items: center;
+    }
+    .stat {
+      font-size: 13px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #eef2ff;
+    }
+    .stat span.label {
+      font-weight: 600;
+      margin-right: 4px;
+    }
+    button {
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      padding: 6px 10px;
+      font-size: 13px;
+      background: #ffffff;
+      cursor: pointer;
+    }
+    button.primary {
+      background: #2563eb;
+      color: #ffffff;
+      border-color: #2563eb;
+    }
+    button.small {
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
+    .badge-ok {
+      color: #166534;
+      background: #dcfce7;
+    }
+    .badge-warn {
+      color: #92400e;
+      background: #fef3c7;
+    }
+    .badge-error {
+      color: #b91c1c;
+      background: #fee2e2;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+    th, td {
+      border-bottom: 1px solid #e5e7eb;
+      padding: 6px 8px;
+      text-align: left;
+      vertical-align: middle;
+    }
+    th {
+      background: #f3f4f6;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    tr:nth-child(even) td {
+      background: #f9fafb;
+    }
+    input[type="text"] {
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      font-size: 13px;
+      width: 220px;
+    }
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 8px;
+      font-size: 13px;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      resize: vertical;
+      box-sizing: border-box;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+    .hint {
+      font-size: 11px;
+      color: #6b7280;
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+    .muted {
+      font-size: 12px;
+      color: #6b7280;
+    }
+    @media (max-width: 768px) {
+      th, td {
+        font-size: 12px;
+      }
+      header h1 {
+        font-size: 18px;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>7번 세팅 도구 · Setup & Monitor Center</h1>
-  <p>각 도구의 플랫폼 세팅 · 자동 테스트 · 자동 수정 상태를 한 화면에서 관리합니다.</p>
+  <header>
+    <h1>7번 세팅 도구 · Setup &amp; Monitor Center</h1>
+    <p>각 도구의 플랫폼 세팅 · 자동 테스트 · 자동 수정 상태를 한 화면에서 관리합니다.</p>
+  </header>
 
-  <div class="card">
-    <h2>엔진 상태 · 요약</h2>
-    <div class="row">
-      <div>엔진 상태: <span id="engineStatus">정상</span></div>
-      <div>마지막 갱신: <span id="lastUpdated">--:--:--</span></div>
-      <div>도구 개수: <span id="toolCount">0</span></div>
-      <div>도구 상태 요약:
-        <span class="badge badge-ok">정상 <span id="okCount">0</span></span>
-        <span class="badge badge-warn">경고 <span id="warnCount">0</span></span>
-        <span class="badge badge-err">오류 <span id="errCount">0</span></span>
+  <main>
+    <!-- 엔진 상태 카드 -->
+    <section class="card">
+      <h2>엔진 상태 · 요약</h2>
+      <div class="row" id="engine-summary">
+        <div class="stat"><span class="label">엔진 상태:</span><span id="engine-status">정상</span></div>
+        <div class="stat"><span class="label">마지막 갱신:</span><span id="last-updated">--:--:--</span></div>
+        <div class="stat"><span class="label">도구 개수:</span><span id="tool-count">0</span></div>
+        <div class="stat"><span class="label">도구 상태 요약:</span>
+          <span id="summary-ok">정상 0</span> ·
+          <span id="summary-warn">경고 0</span> ·
+          <span id="summary-error">오류 0</span>
+        </div>
+        <div class="stat"><span class="label">복잡 오류 개수:</span><span id="complex-errors">0</span></div>
       </div>
-      <div>복잡 오류 개수: <span id="complexCount">0</span></div>
-    </div>
-    <button id="reloadBtn">도구 목록 새로 불러오기</button>
-    <button id="openPasteBtn">도구 목록 붙여넣기</button>
-    <small>· 도구 목록은 브라우저에 저장되어, 창을 꺼도 다시 나타납니다.</small>
+      <div class="row" style="margin-top:10px;">
+        <button id="reload-tools-btn" class="primary small">도구 목록 새로 불러오기</button>
+        <button id="open-paste-panel-btn" class="small">도구 목록 붙여넣기</button>
+        <span class="hint">· 도구 목록은 브라우저에 저장되어, 창을 꺼도 다시 나타납니다.</span>
+      </div>
+    </section>
 
-    <div id="paste-panel" class="card">
-      <strong>도구 목록 붙여넣기</strong>
-      <p style="margin:4px 0;">
-        형식: <code>번호,도구 이름,상태,코드 저장소,배포 주소</code><br/>
-        예: <code>1,1번 고객 자동화 안내서,미연결,https://github.com/.../tool-1,https://1-guide...deno.net/</code>
+    <!-- 도구 목록 붙여넣기 패널 -->
+    <section class="card" id="paste-panel" style="display:none;">
+      <h2>도구 목록 붙여넣기</h2>
+      <p class="muted">
+        한 줄에 하나씩 <strong>번호, 도구 이름, 상태</strong>를 적으면 됩니다.<br/>
+        예시) <code>1, 1번 고객 자동화 안내서, 미연결</code>
       </p>
-      <textarea id="toolText" placeholder="여기에 줄마다 도구 정보를 붙여넣으세요."></textarea>
-      <br/>
-      <button id="saveToolsBtn">도구 목록 저장</button>
-    </div>
-  </div>
+      <textarea id="tools-input" placeholder="예시&#10;1, 1번 고객 자동화 안내서, 미연결&#10;7, 7번 세팅 도구, 정상&#10;20, 20번 운영 매뉴얼, 오류"></textarea>
+      <div class="row" style="margin-top:8px;">
+        <button id="save-tools-btn" class="primary small">도구 목록 저장</button>
+        <button id="cancel-paste-btn" class="small">닫기</button>
+        <span class="hint">저장하면 표에 바로 반영되고, 다음에 열어도 그대로 보입니다.</span>
+      </div>
+    </section>
 
-  <div class="card">
-    <h2>도구별 세팅 및 상태</h2>
-    <p style="margin:4px 0;">도구를 열면 저장된 도구 목록이 자동으로 표시됩니다. 나중에는 플랫폼의 “도구 목록 API”로 교체할 수 있습니다.</p>
-    <input id="searchBox" type="text" placeholder="도구 이름 또는 번호 검색" />
-    <button id="clearSearch">검색 지우기</button>
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>도구 이름</th>
-          <th>상태</th>
-          <th>코드 저장소</th>
-          <th>배포 주소</th>
-          <th>마지막 테스트</th>
-          <th>동작</th>
-        </tr>
-      </thead>
-      <tbody id="toolTableBody">
-        <tr><td colspan="7">도구 목록이 없습니다. “도구 목록 붙여넣기”를 먼저 사용하세요.</td></tr>
-      </tbody>
-    </table>
-  </div>
+    <!-- 도구별 세팅 및 상태 -->
+    <section class="card">
+      <h2>도구별 세팅 및 상태</h2>
+      <p class="muted">
+        도구를 열면 저장된 도구 목록이 자동으로 표시됩니다.<br/>
+        나중에는 플랫폼의 “도구 목록 API”로 교체할 수 있습니다.
+      </p>
 
-  <div class="card">
-    <h2>도구별 자동 테스트·자동 수정 요약</h2>
-    <p>여기에는 “자동으로 고칠 수 있는 오류”와 “사용자 선택이 필요한 오류”가 모여서 표시될 예정입니다. 지금은 구조만 준비된 상태입니다.</p>
-    <div id="summaryArea">현재 자동 수집된 오류 정보 없음 (예시 단계).</div>
-  </div>
+      <div class="row" style="margin-top:6px; justify-content: space-between;">
+        <div>
+          <input type="text" id="search-input" placeholder="도구 이름 또는 번호 검색" />
+          <button id="clear-search-btn" class="small">검색 지우기</button>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width:50px;">#</th>
+            <th>도구 이름</th>
+            <th style="width:80px;">상태</th>
+            <th style="width:110px;">코드 저장소</th>
+            <th style="width:110px;">배포 주소</th>
+            <th style="width:90px;">마지막 테스트</th>
+            <th style="width:130px;">동작</th>
+          </tr>
+        </thead>
+        <tbody id="tools-tbody">
+          <!-- JS에서 채움 -->
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 자동 테스트 · 자동 수정 요약 (구조만) -->
+    <section class="card">
+      <h2>도구별 자동 테스트·자동 수정 요약</h2>
+      <p class="muted" id="auto-summary">
+        현재 자동 수집된 오류 정보 없음 (예시 단계).
+      </p>
+    </section>
+  </main>
 
   <script>
-    const STORAGE_KEY = "wic_tool_list_v1";
+    // ----- 데이터 저장 키 -----
+    const STORAGE_KEY = "wic_setup_tool_list_v1";
 
-    function nowTime() {
+    function nowTimeString() {
       const d = new Date();
-      return d.toTimeString().split(" ")[0];
+      const pad = (n) => String(n).padStart(2, "0");
+      return pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
     }
 
-    function loadTools() {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return [];
+    function loadToolsFromStorage() {
       try {
-        return JSON.parse(raw);
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return [];
+        const arr = JSON.parse(raw);
+        if (!Array.isArray(arr)) return [];
+        return arr;
       } catch (e) {
+        console.error("loadTools error", e);
         return [];
       }
     }
 
-    function saveTools(tools) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(tools));
-    }
-
-    function renderTools(filterText = "") {
-      const tbody = document.getElementById("toolTableBody");
-      const tools = loadTools();
-      document.getElementById("toolCount").textContent = tools.length;
-
-      let ok = 0, warn = 0, err = 0;
-      tools.forEach(t => {
-        if (t.status === "정상") ok++;
-        else if (t.status === "경고") warn++;
-        else if (t.status === "오류") err++;
-      });
-      document.getElementById("okCount").textContent = ok;
-      document.getElementById("warnCount").textContent = warn;
-      document.getElementById("errCount").textContent = err;
-      document.getElementById("complexCount").textContent = 0;
-
-      tbody.innerHTML = "";
-      const ft = filterText.trim();
-      const filtered = tools.filter(t => {
-        if (!ft) return true;
-        return (t.id + "").includes(ft) || (t.name || "").includes(ft);
-      });
-
-      if (filtered.length === 0) {
-        const tr = document.createElement("tr");
-        const td = document.createElement("td");
-        td.colSpan = 7;
-        td.textContent = "표시할 도구가 없습니다.";
-        tr.appendChild(td);
-        tbody.appendChild(tr);
-        return;
+    function saveToolsToStorage(tools) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(tools));
+      } catch (e) {
+        console.error("saveTools error", e);
       }
-
-      filtered.forEach(t => {
-        const tr = document.createElement("tr");
-
-        const tdId = document.createElement("td");
-        tdId.textContent = t.id;
-        tr.appendChild(tdId);
-
-        const tdName = document.createElement("td");
-        tdName.textContent = t.name;
-        tr.appendChild(tdName);
-
-        const tdStatus = document.createElement("td");
-        tdStatus.textContent = t.status || "미연결";
-        tr.appendChild(tdStatus);
-
-        const tdRepo = document.createElement("td");
-        const aRepo = document.createElement("a");
-        aRepo.href = t.repo || "#";
-        aRepo.target = "_blank";
-        aRepo.textContent = t.repo ? "열기" : "-";
-        tdRepo.appendChild(aRepo);
-        tr.appendChild(tdRepo);
-
-        const tdDeploy = document.createElement("td");
-        const aDep = document.createElement("a");
-        aDep.href = t.deploy || "#";
-        aDep.target = "_blank";
-        aDep.textContent = t.deploy ? "열기" : "-";
-        tdDeploy.appendChild(aDep);
-        tr.appendChild(tdDeploy);
-
-        const tdTest = document.createElement("td");
-        tdTest.textContent = t.lastTest || "-";
-        tr.appendChild(tdTest);
-
-        const tdAction = document.createElement("td");
-        const btnStatus = document.createElement("button");
-        btnStatus.textContent = "상태표시 · 세부 보기";
-        btnStatus.onclick = () => {
-          alert(
-            `[${t.id}번] ${t.name}\n상태: ${t.status || "미연결"}\n코드: ${t.repo || "-"}\n배포: ${t.deploy || "-"}`
-          );
-        };
-        tdAction.appendChild(btnStatus);
-        tr.appendChild(tdAction);
-
-        tbody.appendChild(tr);
-      });
     }
 
-    function parsePasted(text) {
-      const lines = text.split("\n").map(l => l.trim()).filter(l => l);
-      const tools = [];
+    function parseToolsFromText(text) {
+      const lines = text.split(/\r?\n/);
+      const result = [];
       for (const line of lines) {
-        const parts = line.split(",").map(p => p.trim());
-        if (parts.length < 2) continue;
-        const [id, name, status, repo, deploy] = parts;
-        tools.push({
-          id: id || "",
-          name: name || "",
-          status: status || "미연결",
-          repo: repo || "",
-          deploy: deploy || "",
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+        const parts = trimmed.split(",");
+        const num = (parts[0] || "").trim();
+        const name = (parts[1] || "").trim();
+        const status = (parts[2] || "").trim() || "미연결";
+        if (!num || !name) continue;
+        result.push({
+          id: num,
+          name: name,
+          status: status,
+          repo: "",
+          deploy: "",
           lastTest: "-"
         });
       }
-      return tools;
+      return result;
     }
 
-    document.getElementById("reloadBtn").onclick = () => {
-      document.getElementById("lastUpdated").textContent = nowTime();
-      renderTools(document.getElementById("searchBox").value);
-    };
+    function renderTools(tools) {
+      const tbody = document.getElementById("tools-tbody");
+      tbody.innerHTML = "";
+      const search = (document.getElementById("search-input").value || "").toLowerCase();
 
-    document.getElementById("openPasteBtn").onclick = () => {
-      const panel = document.getElementById("paste-panel");
-      panel.style.display = panel.style.display === "none" ? "block" : "none";
-    };
+      let ok = 0, warn = 0, err = 0;
 
-    document.getElementById("saveToolsBtn").onclick = () => {
-      const text = document.getElementById("toolText").value;
-      const tools = parsePasted(text);
-      saveTools(tools);
-      document.getElementById("lastUpdated").textContent = nowTime();
-      renderTools(document.getElementById("searchBox").value);
-      alert("도구 목록이 저장되었습니다.");
-    };
+      const filtered = tools.filter(t => {
+        if (!search) return true;
+        return (
+          (t.id + "").includes(search) ||
+          (t.name || "").toLowerCase().includes(search)
+        );
+      });
 
-    document.getElementById("searchBox").addEventListener("input", (e) => {
-      renderTools(e.target.value);
-    });
+      for (const t of filtered) {
+        const tr = document.createElement("tr");
 
-    document.getElementById("clearSearch").onclick = () => {
-      document.getElementById("searchBox").value = "";
-      renderTools("");
-    };
+        let statusClass = "";
+        if (t.status === "정상") {
+          ok++;
+          statusClass = "badge-ok";
+        } else if (t.status === "경고") {
+          warn++;
+          statusClass = "badge-warn";
+        } else if (t.status === "오류") {
+          err++;
+          statusClass = "badge-error";
+        }
 
-    // 첫 로드 시 localStorage에서 불러오기
-    renderTools("");
+        tr.innerHTML = `
+          <td>${t.id}</td>
+          <td>${t.name}</td>
+          <td><span class="${statusClass}" style="padding:2px 6px;border-radius:999px;font-size:11px;">${t.status || "미연결"}</span></td>
+          <td>${t.repo ? `<a href="${t.repo}" target="_blank">열기</a>` : "-"}</td>
+          <td>${t.deploy ? `<a href="${t.deploy}" target="_blank">열기</a>` : "-"}</td>
+          <td>${t.lastTest || "-"}</td>
+          <td>
+            <button class="small" data-action="status" data-id="${t.id}">상태표시</button>
+            <button class="small" data-action="detail" data-id="${t.id}">세부 보기</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+
+      // 상태 요약 반영
+      document.getElementById("tool-count").textContent = tools.length;
+      document.getElementById("summary-ok").textContent = "정상 " + ok;
+      document.getElementById("summary-warn").textContent = "경고 " + warn;
+      document.getElementById("summary-error").textContent = "오류 " + err;
+      document.getElementById("last-updated").textContent = nowTimeString();
+      document.getElementById("engine-status").textContent = "정상";
+      document.getElementById("complex-errors").textContent = "0";
+
+      if (tools.length === 0) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td colspan="7" style="text-align:center;color:#6b7280;font-size:12px;">
+            표시할 도구가 없습니다. “도구 목록 붙여넣기” 버튼을 눌러 목록을 저장해 보세요.
+          </td>`;
+        tbody.appendChild(tr);
+      }
+    }
+
+    function init() {
+      const tools = loadToolsFromStorage();
+      renderTools(tools);
+
+      // 검색
+      document.getElementById("search-input").addEventListener("input", () => {
+        renderTools(loadToolsFromStorage());
+      });
+      document.getElementById("clear-search-btn").addEventListener("click", () => {
+        document.getElementById("search-input").value = "";
+        renderTools(loadToolsFromStorage());
+      });
+
+      // 도구 목록 새로 불러오기 (= 저장된 값 다시 그림)
+      document.getElementById("reload-tools-btn").addEventListener("click", () => {
+        renderTools(loadToolsFromStorage());
+      });
+
+      // 붙여넣기 패널 열기/닫기
+      const pastePanel = document.getElementById("paste-panel");
+      document.getElementById("open-paste-panel-btn").addEventListener("click", () => {
+        const toolsText = loadToolsFromStorage()
+          .map(t => `${t.id}, ${t.name}, ${t.status}`)
+          .join("\n");
+        document.getElementById("tools-input").value = toolsText || 
+          "1, 1번 고객 자동화 안내서, 미연결\n7, 7번 세팅 도구, 정상\n20, 20번 운영 매뉴얼, 오류";
+        pastePanel.style.display = "block";
+      });
+      document.getElementById("cancel-paste-btn").addEventListener("click", () => {
+        pastePanel.style.display = "none";
+      });
+
+      // 도구 목록 저장
+      document.getElementById("save-tools-btn").addEventListener("click", () => {
+        const text = document.getElementById("tools-input").value || "";
+        const parsed = parseToolsFromText(text);
+        saveToolsToStorage(parsed);
+        renderTools(parsed);
+        pastePanel.style.display = "none";
+      });
+
+      // 상태표시 / 세부 보기 버튼 (자리만)
+      document.getElementById("tools-tbody").addEventListener("click", (ev) => {
+        const btn = ev.target.closest("button");
+        if (!btn) return;
+        const action = btn.getAttribute("data-action");
+        const id = btn.getAttribute("data-id");
+        if (action === "status") {
+          alert(id + "번 도구 상태 표시(예시 단계)입니다.");
+        } else if (action === "detail") {
+          alert(id + "번 도구 세부 보기(예시 단계)입니다.");
+        }
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
   </script>
 </body>
 </html>
