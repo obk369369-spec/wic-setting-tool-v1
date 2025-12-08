@@ -2,417 +2,1184 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>7번 세팅 도구 · Setup & Monitor Center</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WIC 세팅 도구 v2 · 7번 도구</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
+    :root {
+      --bg-main: #f5f7fb;
+      --bg-card: #ffffff;
+      --border-soft: #dde2ee;
+      --accent: #2d6cdf;
+      --accent-soft: #e4edff;
+      --text-main: #1f2933;
+      --text-muted: #6b7280;
+      --danger: #e11d48;
+      --success: #16a34a;
+      --warning: #f97316;
+      --shadow-soft: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --radius-lg: 18px;
+      --radius-md: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       margin: 0;
-      padding: 0;
-      background: #f5f5f5;
-      color: #222;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top left, #eef2ff, #f9fafb);
+      color: var(--text-main);
     }
-    header {
-      background: #1f2933;
-      color: #fff;
-      padding: 16px 20px;
-    }
-    header h1 {
-      margin: 0 0 4px 0;
-      font-size: 20px;
-    }
-    header p {
-      margin: 0;
-      font-size: 13px;
-      opacity: 0.85;
-    }
-    main {
-      padding: 16px;
-      max-width: 1100px;
+
+    .app-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 24px;
+      max-width: 1180px;
       margin: 0 auto;
     }
-    .card {
-      background: #ffffff;
-      border-radius: 8px;
-      padding: 14px 16px;
+
+    header {
       margin-bottom: 16px;
-      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
     }
-    .card h2 {
-      margin: 0 0 8px 0;
-      font-size: 18px;
-    }
-    .card small {
-      font-size: 12px;
-      color: #6b7280;
-    }
-    .row {
+
+    .badge-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 8px;
+      gap: 8px;
+      margin-bottom: 8px;
       align-items: center;
     }
-    .stat {
-      font-size: 13px;
-      padding: 6px 10px;
+
+    .badge {
+      padding: 4px 10px;
       border-radius: 999px;
-      background: #eef2ff;
-    }
-    .stat span.label {
-      font-weight: 600;
-      margin-right: 4px;
-    }
-    button {
-      border-radius: 6px;
-      border: 1px solid #d1d5db;
-      padding: 6px 10px;
-      font-size: 13px;
-      background: #ffffff;
-      cursor: pointer;
-    }
-    button.primary {
-      background: #2563eb;
-      color: #ffffff;
-      border-color: #2563eb;
-    }
-    button.small {
-      padding: 4px 8px;
       font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(45, 108, 223, 0.06);
+      color: var(--accent);
+      border: 1px solid rgba(45, 108, 223, 0.18);
     }
-    button:disabled {
-      opacity: 0.6;
-      cursor: default;
+
+    .badge-secondary {
+      background: #e5e7eb;
+      color: #374151;
+      border-color: #d1d5db;
     }
-    .badge-ok {
-      color: #166534;
-      background: #dcfce7;
+
+    .title {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
     }
-    .badge-warn {
-      color: #92400e;
-      background: #fef3c7;
+
+    .title span.sub {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
     }
-    .badge-error {
-      color: #b91c1c;
-      background: #fee2e2;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
+
+    .subtitle {
       font-size: 13px;
-      margin-top: 8px;
+      color: var(--text-muted);
+      margin-bottom: 18px;
     }
-    th, td {
-      border-bottom: 1px solid #e5e7eb;
-      padding: 6px 8px;
-      text-align: left;
-      vertical-align: middle;
+
+    .subtitle-strong {
+      font-weight: 500;
+      color: #4b5563;
     }
-    th {
-      background: #f3f4f6;
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 1.7fr) minmax(0, 1.3fr);
+      gap: 18px;
+    }
+
+    @media (max-width: 980px) {
+      main {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      padding: 18px 18px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+    }
+
+    .card-title {
+      font-size: 15px;
       font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title-index {
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .card-description {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    label {
+      font-size: 12px;
+      font-weight: 500;
+      color: #4b5563;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    label span.hint {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+
+    textarea,
+    input {
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-soft);
+      padding: 8px 10px;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      background: #f9fafb;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease,
+        background-color 0.15s ease;
+      width: 100%;
+    }
+
+    textarea:focus,
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.18);
+      background: #ffffff;
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .inline-input-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.2fr) minmax(0, 1.4fr);
+      gap: 8px;
+    }
+
+    @media (max-width: 840px) {
+      .inline-input-row {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+      align-items: center;
+    }
+
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 7px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.05s ease, box-shadow 0.1s ease,
+        background-color 0.1s ease;
       white-space: nowrap;
     }
-    tr:nth-child(even) td {
-      background: #f9fafb;
+
+    button:active {
+      transform: translateY(1px);
+      box-shadow: none;
     }
-    input[type="text"] {
-      padding: 6px 8px;
-      border-radius: 6px;
-      border: 1px solid #d1d5db;
-      font-size: 13px;
-      width: 220px;
+
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #ffffff;
+      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.35);
     }
-    textarea {
-      width: 100%;
-      min-height: 120px;
-      padding: 8px;
-      font-size: 13px;
-      border-radius: 6px;
-      border: 1px solid #d1d5db;
-      resize: vertical;
-      box-sizing: border-box;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+    .btn-ghost {
+      background: #e5e7eb;
+      color: #111827;
     }
-    .hint {
+
+    .btn-danger {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .timestamp {
       font-size: 11px;
-      color: #6b7280;
-      margin-top: 4px;
-      line-height: 1.4;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 2px;
     }
-    .muted {
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #9ca3af;
+    }
+
+    .dot-ok {
+      background: var(--success);
+    }
+
+    .dot-warn {
+      background: var(--warning);
+    }
+
+    .dot-error {
+      background: var(--danger);
+    }
+
+    .rules-list {
       font-size: 12px;
-      color: #6b7280;
+      color: var(--text-muted);
+      padding-left: 16px;
+      margin: 4px 0 0;
     }
-    @media (max-width: 768px) {
-      th, td {
-        font-size: 12px;
-      }
-      header h1 {
-        font-size: 18px;
-      }
+
+    .rules-list li {
+      margin-bottom: 2px;
+    }
+
+    .test-summary {
+      font-size: 12px;
+      margin-top: 6px;
+      padding: 6px 8px;
+      border-radius: 10px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .test-summary span.label {
+      font-weight: 600;
+    }
+
+    .cards-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 420px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .tool-card {
+      border-radius: 14px;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      padding: 10px 10px 9px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .tool-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tool-name {
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tool-index-pill {
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: #e0ecff;
+      color: #1d4ed8;
+      font-weight: 600;
+    }
+
+    .tool-status {
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tool-status.ok {
+      color: var(--success);
+    }
+
+    .tool-status.warn {
+      color: var(--warning);
+    }
+
+    .tool-status.error {
+      color: var(--danger);
+    }
+
+    .tool-fields {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 4px;
+      margin-top: 2px;
+    }
+
+    .mini-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 1px;
+    }
+
+    .mini-input {
+      font-size: 12px;
+      padding: 6px 7px;
+      border-radius: 9px;
+      background: #ffffff;
+    }
+
+    .url-display {
+      font-size: 11px;
+      color: #4b5563;
+      background: #e5e7eb;
+      padding: 4px 6px;
+      border-radius: 999px;
+      max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    footer {
+      margin-top: 18px;
+      font-size: 11px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .footer-left,
+    .footer-right {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      font-size: 11px;
+    }
+
+    .pill-strong {
+      background: #dbeafe;
+      color: #1d4ed8;
+      font-weight: 600;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>7번 세팅 도구 · Setup &amp; Monitor Center</h1>
-    <p>각 도구의 플랫폼 세팅 · 자동 테스트 · 자동 수정 상태를 한 화면에서 관리합니다.</p>
-  </header>
+  <div class="app-shell">
+    <header>
+      <div class="badge-row">
+        <span class="badge">7번 도구 · WIC 세팅 도구 v2</span>
+        <span class="badge badge-secondary">Local-only · Safe DOM · localStorage</span>
+      </div>
+      <div class="title">
+        WIC 세팅 도구 v2
+        <span class="sub">도구 목록 · GitHub · Deno · 업로드 주소를 한 화면에서 관리</span>
+      </div>
+      <div class="subtitle">
+        <span class="subtitle-strong">※ 이 화면에 보이는 것만 동작합니다.</span>
+        브라우저 <strong>localStorage</strong>에만 자동 저장·복원하며, 서버 통신·백그라운드 타이머는 사용하지 않습니다.
+      </div>
+    </header>
 
-  <main>
-    <!-- 엔진 상태 카드 -->
-    <section class="card">
-      <h2>엔진 상태 · 요약</h2>
-      <div class="row" id="engine-summary">
-        <div class="stat"><span class="label">엔진 상태:</span><span id="engine-status">정상</span></div>
-        <div class="stat"><span class="label">마지막 갱신:</span><span id="last-updated">--:--:--</span></div>
-        <div class="stat"><span class="label">도구 개수:</span><span id="tool-count">0</span></div>
-        <div class="stat"><span class="label">도구 상태 요약:</span>
-          <span id="summary-ok">정상 0</span> ·
-          <span id="summary-warn">경고 0</span> ·
-          <span id="summary-error">오류 0</span>
+    <main>
+      <!-- ① 도구 목록 & 기본 주소 -->
+      <section class="card" aria-label="도구 목록 및 기본 주소">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="card-title-index">①</span>
+            도구 목록 &amp; 기본 주소
+          </div>
         </div>
-        <div class="stat"><span class="label">복잡 오류 개수:</span><span id="complex-errors">0</span></div>
-      </div>
-      <div class="row" style="margin-top:10px;">
-        <button id="reload-tools-btn" class="primary small">도구 목록 새로 불러오기</button>
-        <button id="open-paste-panel-btn" class="small">도구 목록 붙여넣기</button>
-        <span class="hint">· 도구 목록은 브라우저에 저장되어, 창을 꺼도 다시 나타납니다.</span>
-      </div>
-    </section>
+        <p class="card-description">
+          도구 이름 목록과 GitHub·Deno·업로드 기본 주소를 한 번만 입력해 두고,
+          <strong>카드 생성 / 갱신</strong> 버튼으로 각 도구 카드를 자동 생성합니다.
+        </p>
 
-    <!-- 도구 목록 붙여넣기 패널 -->
-    <section class="card" id="paste-panel" style="display:none;">
-      <h2>도구 목록 붙여넣기</h2>
-      <p class="muted">
-        한 줄에 하나씩 <strong>번호, 도구 이름, 상태</strong>를 적으면 됩니다.<br/>
-        예시) <code>1, 1번 고객 자동화 안내서, 미연결</code>
-      </p>
-      <textarea id="tools-input" placeholder="예시&#10;1, 1번 고객 자동화 안내서, 미연결&#10;7, 7번 세팅 도구, 정상&#10;20, 20번 운영 매뉴얼, 오류"></textarea>
-      <div class="row" style="margin-top:8px;">
-        <button id="save-tools-btn" class="primary small">도구 목록 저장</button>
-        <button id="cancel-paste-btn" class="small">닫기</button>
-        <span class="hint">저장하면 표에 바로 반영되고, 다음에 열어도 그대로 보입니다.</span>
-      </div>
-    </section>
+        <div class="field-group">
+          <div class="field">
+            <label>
+              도구 목록 (한 줄당 1개)
+              <span class="hint">예: 1번 고객 자동화 안내서 / 2번 입찰 프로그램 ...</span>
+            </label>
+            <textarea id="toolList" placeholder="예시:
+1번 고객 자동화 안내서
+2번 입찰 프로그램
+3번 코딩 기초 연습 도구
+4번 연구비 박사 엑셀 생성기"></textarea>
+          </div>
 
-    <!-- 도구별 세팅 및 상태 -->
-    <section class="card">
-      <h2>도구별 세팅 및 상태</h2>
-      <p class="muted">
-        도구를 열면 저장된 도구 목록이 자동으로 표시됩니다.<br/>
-        나중에는 플랫폼의 “도구 목록 API”로 교체할 수 있습니다.
-      </p>
-
-      <div class="row" style="margin-top:6px; justify-content: space-between;">
-        <div>
-          <input type="text" id="search-input" placeholder="도구 이름 또는 번호 검색" />
-          <button id="clear-search-btn" class="small">검색 지우기</button>
+          <div class="inline-input-row">
+            <div class="field">
+              <label>
+                GitHub 기본 주소
+                <span class="hint">예: https://github.com/obk369369-spec</span>
+              </label>
+              <input id="githubBase" type="url" placeholder="https://github.com/obk369369-spec" />
+            </div>
+            <div class="field">
+              <label>
+                Deno 기본 주소
+                <span class="hint">예: https://dash.deno.com/projects</span>
+              </label>
+              <input id="denoBase" type="url" placeholder="https://dash.deno.com/projects" />
+            </div>
+            <div class="field">
+              <label>
+                업로드 기본 주소
+                <span class="hint">예: https://tool-name.obk369369-spec.deno.net</span>
+              </label>
+              <input id="uploadBase" type="url" placeholder="https://example.obk369369-spec.deno.net" />
+            </div>
+          </div>
         </div>
+
+        <div class="button-row">
+          <button type="button" class="btn-primary" id="btnGenerate">
+            카드 생성 / 갱신
+          </button>
+          <button type="button" class="btn-ghost" id="btnRunTests">
+            전체 자동 테스트 1회
+          </button>
+          <button type="button" class="btn-danger" id="btnReset">
+            데이터 초기화
+          </button>
+          <div class="timestamp" id="autoSaveInfo">
+            <span class="dot" id="autoSaveDot"></span>
+            자동 저장: 대기 중
+          </div>
+        </div>
+      </section>
+
+      <!-- ② 자동 테스트 규칙 & 테스트 요약 -->
+      <section class="card" aria-label="자동 테스트 규칙 및 요약">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="card-title-index">②</span>
+            자동 테스트 규칙 &amp; 요약
+          </div>
+        </div>
+        <p class="card-description">
+          이 영역은 <strong>테스트 규칙 안내 + 최근 테스트 결과 요약</strong>을 보여줍니다.
+          실제 테스트는 네트워크 요청 없이 <strong>문자열 검사만</strong>으로 판단합니다.
+        </p>
+
+        <ul class="rules-list">
+          <li>테스트는 네트워크 요청 없이 <strong>문자열 규칙</strong>만으로 판단합니다.</li>
+          <li>
+            각 카드의 GitHub / Deno / 업로드 주소는
+            <strong>비어 있거나, <code>http</code> 또는 <code>https</code>로 시작</strong>해야 안전하다고 봅니다.
+          </li>
+          <li>세 주소 중 하나라도 다른 형식이면 해당 카드에 <strong>경고</strong>를 표시합니다.</li>
+        </ul>
+
+        <div id="testSummary" class="test-summary" aria-live="polite">
+          <span class="label">최근 테스트 결과</span>
+          <span id="testSummaryText">아직 수행된 테스트가 없습니다.</span>
+        </div>
+
+        <div class="card-header" style="margin-top:10px;">
+          <div class="card-title">
+            <span class="card-title-index">③</span>
+            도구 카드 목록
+          </div>
+        </div>
+        <p class="card-description">
+          도구 이름에서 <strong>번호와 이름</strong>을 자동으로 분리하고, 각 도구별로
+          GitHub·Deno·업로드 주소를 개별 관리합니다. 필요하면 카드 안에서 직접 수정할 수 있습니다.
+        </p>
+
+        <div class="cards-container" id="cardsContainer" aria-label="도구 카드 목록">
+          <!-- 도구 카드들이 여기에 동적으로 추가됩니다. -->
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-left">
+        <span class="pill pill-strong">WIC 자동화 시스템 · 7번 세팅 도구</span>
+        <span class="pill">v2 · Local-only</span>
       </div>
-
-      <table>
-        <thead>
-          <tr>
-            <th style="width:50px;">#</th>
-            <th>도구 이름</th>
-            <th style="width:80px;">상태</th>
-            <th style="width:110px;">코드 저장소</th>
-            <th style="width:110px;">배포 주소</th>
-            <th style="width:90px;">마지막 테스트</th>
-            <th style="width:130px;">동작</th>
-          </tr>
-        </thead>
-        <tbody id="tools-tbody">
-          <!-- JS에서 채움 -->
-        </tbody>
-      </table>
-    </section>
-
-    <!-- 자동 테스트 · 자동 수정 요약 (구조만) -->
-    <section class="card">
-      <h2>도구별 자동 테스트·자동 수정 요약</h2>
-      <p class="muted" id="auto-summary">
-        현재 자동 수집된 오류 정보 없음 (예시 단계).
-      </p>
-    </section>
-  </main>
+      <div class="footer-right">
+        <span>저장 위치: 브라우저 localStorage (키: <code>wic-settings-v2</code>)</span>
+      </div>
+    </footer>
+  </div>
 
   <script>
-    // ----- 데이터 저장 키 -----
-    const STORAGE_KEY = "wic_setup_tool_list_v1";
+    (function () {
+      const STORAGE_KEY = "wic-settings-v2";
 
-    function nowTimeString() {
-      const d = new Date();
-      const pad = (n) => String(n).padStart(2, "0");
-      return pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
-    }
+      const $ = (id) => document.getElementById(id);
 
-    function loadToolsFromStorage() {
-      try {
+      const els = {
+        toolList: $("toolList"),
+        githubBase: $("githubBase"),
+        denoBase: $("denoBase"),
+        uploadBase: $("uploadBase"),
+        btnGenerate: $("btnGenerate"),
+        btnRunTests: $("btnRunTests"),
+        btnReset: $("btnReset"),
+        autoSaveInfo: $("autoSaveInfo"),
+        autoSaveDot: $("autoSaveDot"),
+        testSummaryText: $("testSummaryText"),
+        cardsContainer: $("cardsContainer"),
+      };
+
+      /** 간단한 slug 생성: 한글/공백 등은 안전한 형태로 변환 */
+      function makeSlug(name) {
+        const trimmed = (name || "").trim();
+        if (!trimmed) return "";
+        // "1번 고객 자동화 안내서" → 번호 제거 후 이름만
+        const numberRemoved = trimmed.replace(/^\d+\s*번\s*/, "");
+        return numberRemoved
+          .toLowerCase()
+          .replace(/[\s·]+/g, "-")
+          .replace(/[^a-z0-9\-]/g, "")
+          .replace(/\-+/g, "-")
+          .replace(/^\-+|\-+$/g, "");
+      }
+
+      /** 도구 이름에서 번호와 본문 분리 */
+      function parseToolName(raw) {
+        const text = (raw || "").trim();
+        if (!text) return { index: "", label: "" };
+        const match = text.match(/^(\d+)\s*번\s*(.+)$/);
+        if (match) {
+          return { index: match[1] + "번", label: match[2].trim() };
+        }
+        return { index: "", label: text };
+      }
+
+      /** 현재 상태 읽기 */
+      function readStateFromUI() {
+        const rawList = els.toolList.value || "";
+        const lines = rawList
+          .split(/\r?\n/)
+          .map((l) => l.trim())
+          .filter((l) => l.length > 0);
+
+        const githubBase = (els.githubBase.value || "").trim();
+        const denoBase = (els.denoBase.value || "").trim();
+        const uploadBase = (els.uploadBase.value || "").trim();
+
+        const cards = [];
+        const cardNodes = els.cardsContainer.querySelectorAll(
+          "[data-card-index]"
+        );
+
+        cardNodes.forEach((cardNode) => {
+          const idx = cardNode.getAttribute("data-card-index");
+          const nameRaw = cardNode.getAttribute("data-card-raw-name") || "";
+          const githubPathInput = cardNode.querySelector(
+            "input[data-field='githubPath']"
+          );
+          const denoUrlInput = cardNode.querySelector(
+            "input[data-field='denoUrl']"
+          );
+          const uploadUrlInput = cardNode.querySelector(
+            "input[data-field='uploadUrl']"
+          );
+
+          cards.push({
+            index: idx,
+            rawName: nameRaw,
+            githubPath: githubPathInput ? githubPathInput.value : "",
+            denoUrl: denoUrlInput ? denoUrlInput.value : "",
+            uploadUrl: uploadUrlInput ? uploadUrlInput.value : "",
+            status: cardNode.getAttribute("data-status") || "idle",
+          });
+        });
+
+        return {
+          toolLines: lines,
+          githubBase,
+          denoBase,
+          uploadBase,
+          cards,
+          lastTestSummary: els.testSummaryText.textContent || "",
+        };
+      }
+
+      /** 상태를 localStorage에 저장 */
+      function saveState() {
+        const state = readStateFromUI();
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+          updateAutoSaveIndicator("saved");
+        } catch (e) {
+          updateAutoSaveIndicator("error");
+        }
+      }
+
+      /** localStorage에서 상태 복원 */
+      function loadState() {
         const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return [];
-        const arr = JSON.parse(raw);
-        if (!Array.isArray(arr)) return [];
-        return arr;
-      } catch (e) {
-        console.error("loadTools error", e);
-        return [];
+        if (!raw) {
+          updateAutoSaveIndicator("idle");
+          return;
+        }
+        try {
+          const state = JSON.parse(raw);
+          els.toolList.value = (state.toolLines || []).join("\n");
+          els.githubBase.value = state.githubBase || "";
+          els.denoBase.value = state.denoBase || "";
+          els.uploadBase.value = state.uploadBase || "";
+          els.testSummaryText.textContent = state.lastTestSummary || "아직 수행된 테스트가 없습니다.";
+          renderCardsFromState(state);
+          updateAutoSaveIndicator("loaded");
+        } catch (e) {
+          updateAutoSaveIndicator("error");
+        }
       }
-    }
 
-    function saveToolsToStorage(tools) {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(tools));
-      } catch (e) {
-        console.error("saveTools error", e);
+      /** 자동 저장 표시 갱신 */
+      function updateAutoSaveIndicator(mode) {
+        const dot = els.autoSaveDot;
+        const info = els.autoSaveInfo;
+
+        const now = new Date();
+        const hh = String(now.getHours()).padStart(2, "0");
+        const mm = String(now.getMinutes()).padStart(2, "0");
+        const ss = String(now.getSeconds()).padStart(2, "0");
+        let text = "";
+
+        dot.classList.remove("dot-ok", "dot-warn", "dot-error");
+
+        if (mode === "saved") {
+          dot.classList.add("dot-ok");
+          text = `자동 저장: ${hh}시 ${mm}분 ${ss}초`;
+        } else if (mode === "loaded") {
+          dot.classList.add("dot-ok");
+          text = `자동 저장: 이전 상태 로드 완료 (${hh}시 ${mm}분 ${ss}초 기준)`;
+        } else if (mode === "error") {
+          dot.classList.add("dot-error");
+          text = "자동 저장: 오류 (localStorage 사용 불가)";
+        } else {
+          text = "자동 저장: 대기 중";
+        }
+
+        info.querySelector("span:nth-child(2)").textContent = text;
       }
-    }
 
-    function parseToolsFromText(text) {
-      const lines = text.split(/\r?\n/);
-      const result = [];
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (!trimmed) continue;
-        const parts = trimmed.split(",");
-        const num = (parts[0] || "").trim();
-        const name = (parts[1] || "").trim();
-        const status = (parts[2] || "").trim() || "미연결";
-        if (!num || !name) continue;
-        result.push({
-          id: num,
-          name: name,
-          status: status,
-          repo: "",
-          deploy: "",
-          lastTest: "-"
+      /** 도구 목록에서 카드 다시 생성 */
+      function generateCards() {
+        const state = readStateFromUI();
+        const toolLines = state.toolLines;
+        const existing = new Map();
+        state.cards.forEach((c) => {
+          if (c.rawName) existing.set(c.rawName, c);
+        });
+
+        els.cardsContainer.innerHTML = "";
+
+        toolLines.forEach((rawName, idx) => {
+          const old = existing.get(rawName);
+          const parsed = parseToolName(rawName);
+          const slug = makeSlug(rawName);
+
+          let githubPath = "";
+          let denoUrl = "";
+          let uploadUrl = "";
+
+          if (old) {
+            githubPath = old.githubPath || slug;
+            denoUrl = old.denoUrl || "";
+            uploadUrl = old.uploadUrl || "";
+          } else {
+            githubPath = slug;
+            denoUrl = state.denoBase
+              ? joinUrl(state.denoBase, slug || `tool-${idx + 1}`)
+              : "";
+            uploadUrl = state.uploadBase
+              ? joinUrl(state.uploadBase, slug || `tool-${idx + 1}`)
+              : "";
+          }
+
+          const cardEl = document.createElement("div");
+          cardEl.className = "tool-card";
+          cardEl.setAttribute("data-card-index", String(idx + 1));
+          cardEl.setAttribute("data-card-raw-name", rawName);
+          cardEl.setAttribute("data-status", old ? old.status || "idle" : "idle");
+
+          const fullGithubUrl = state.githubBase && githubPath
+            ? joinUrl(state.githubBase, githubPath)
+            : "";
+
+          cardEl.innerHTML = `
+            <div class="tool-card-header">
+              <div class="tool-name">
+                <span class="tool-index-pill">${parsed.index || (idx + 1 + "번")}</span>
+                <span>${parsed.label || rawName}</span>
+              </div>
+              <div class="tool-status ${statusClass(cardEl.getAttribute("data-status"))}">
+                <span class="dot ${dotClass(cardEl.getAttribute("data-status"))}"></span>
+                <span class="tool-status-text">${statusText(cardEl.getAttribute("data-status"))}</span>
+              </div>
+            </div>
+            <div class="tool-fields">
+              <div>
+                <div class="mini-label">GitHub 경로 (프로젝트/폴더)</div>
+                <input
+                  class="mini-input"
+                  data-field="githubPath"
+                  type="text"
+                  value="${escapeHtml(githubPath)}"
+                  placeholder="${makeSlug(parsed.label) || "tool-" + (idx + 1)}"
+                />
+                <div class="url-display" data-field="githubFullUrl">
+                  ${fullGithubUrl ? escapeHtml(fullGithubUrl) : "GitHub 기본 주소 + 경로로 전체 URL이 표시됩니다."}
+                </div>
+              </div>
+              <div>
+                <div class="mini-label">Deno 프로젝트 URL</div>
+                <input
+                  class="mini-input"
+                  data-field="denoUrl"
+                  type="url"
+                  value="${escapeHtml(denoUrl)}"
+                  placeholder="${state.denoBase ? state.denoBase + "/project-slug" : "https://dash.deno.com/projects/프로젝트"}"
+                />
+              </div>
+              <div>
+                <div class="mini-label">업로드 URL (실제 접속 주소)</div>
+                <input
+                  class="mini-input"
+                  data-field="uploadUrl"
+                  type="url"
+                  value="${escapeHtml(uploadUrl)}"
+                  placeholder="${state.uploadBase ? state.uploadBase + "/..." : "https://tool-name.obk369369-spec.deno.net"}"
+                />
+              </div>
+            </div>
+          `;
+
+          // 입력 변화 시 GitHub full URL + 자동 저장
+          const githubPathInput = cardEl.querySelector(
+            "input[data-field='githubPath']"
+          );
+          const githubFullUrlDisplay = cardEl.querySelector(
+            "[data-field='githubFullUrl']"
+          );
+          const denoUrlInput = cardEl.querySelector(
+            "input[data-field='denoUrl']"
+          );
+          const uploadUrlInput = cardEl.querySelector(
+            "input[data-field='uploadUrl']"
+          );
+
+          if (githubPathInput && githubFullUrlDisplay) {
+            githubPathInput.addEventListener("input", () => {
+              const currentBase = (els.githubBase.value || "").trim();
+              const path = githubPathInput.value.trim();
+              const full =
+                currentBase && path ? joinUrl(currentBase, path) : "";
+              githubFullUrlDisplay.textContent =
+                full || "GitHub 기본 주소 + 경로로 전체 URL이 표시됩니다.";
+              saveState();
+            });
+          }
+
+          [denoUrlInput, uploadUrlInput].forEach((inputEl) => {
+            if (!inputEl) return;
+            inputEl.addEventListener("input", () => {
+              saveState();
+            });
+          });
+
+          els.cardsContainer.appendChild(cardEl);
+        });
+
+        saveState();
+      }
+
+      /** 상태에서 카드 렌더링 (복원용) */
+      function renderCardsFromState(state) {
+        els.cardsContainer.innerHTML = "";
+        const toolLines = state.toolLines || [];
+        const cards = state.cards || [];
+        const byName = new Map();
+        cards.forEach((c) => {
+          if (c.rawName) byName.set(c.rawName, c);
+        });
+
+        toolLines.forEach((rawName, idx) => {
+          const stored = byName.get(rawName) || {
+            index: idx + 1,
+            rawName,
+            githubPath: makeSlug(rawName),
+            denoUrl: "",
+            uploadUrl: "",
+            status: "idle",
+          };
+          const parsed = parseToolName(rawName);
+
+          const cardEl = document.createElement("div");
+          cardEl.className = "tool-card";
+          cardEl.setAttribute(
+            "data-card-index",
+            stored.index ? String(stored.index).replace("번", "") : String(idx + 1)
+          );
+          cardEl.setAttribute("data-card-raw-name", rawName);
+          cardEl.setAttribute("data-status", stored.status || "idle");
+
+          const fullGithubUrl = state.githubBase && stored.githubPath
+            ? joinUrl(state.githubBase, stored.githubPath)
+            : "";
+
+          cardEl.innerHTML = `
+            <div class="tool-card-header">
+              <div class="tool-name">
+                <span class="tool-index-pill">${parsed.index || (idx + 1 + "번")}</span>
+                <span>${parsed.label || rawName}</span>
+              </div>
+              <div class="tool-status ${statusClass(stored.status || "idle")}">
+                <span class="dot ${dotClass(stored.status || "idle")}"></span>
+                <span class="tool-status-text">${statusText(stored.status || "idle")}</span>
+              </div>
+            </div>
+            <div class="tool-fields">
+              <div>
+                <div class="mini-label">GitHub 경로 (프로젝트/폴더)</div>
+                <input
+                  class="mini-input"
+                  data-field="githubPath"
+                  type="text"
+                  value="${escapeHtml(stored.githubPath || "")}"
+                  placeholder="${makeSlug(parsed.label) || "tool-" + (idx + 1)}"
+                />
+                <div class="url-display" data-field="githubFullUrl">
+                  ${fullGithubUrl ? escapeHtml(fullGithubUrl) : "GitHub 기본 주소 + 경로로 전체 URL이 표시됩니다."}
+                </div>
+              </div>
+              <div>
+                <div class="mini-label">Deno 프로젝트 URL</div>
+                <input
+                  class="mini-input"
+                  data-field="denoUrl"
+                  type="url"
+                  value="${escapeHtml(stored.denoUrl || "")}"
+                  placeholder="${state.denoBase ? state.denoBase + "/project-slug" : "https://dash.deno.com/projects/프로젝트"}"
+                />
+              </div>
+              <div>
+                <div class="mini-label">업로드 URL (실제 접속 주소)</div>
+                <input
+                  class="mini-input"
+                  data-field="uploadUrl"
+                  type="url"
+                  value="${escapeHtml(stored.uploadUrl || "")}"
+                  placeholder="${state.uploadBase ? state.uploadBase + "/..." : "https://tool-name.obk369369-spec.deno.net"}"
+                />
+              </div>
+            </div>
+          `;
+
+          const githubPathInput = cardEl.querySelector(
+            "input[data-field='githubPath']"
+          );
+          const githubFullUrlDisplay = cardEl.querySelector(
+            "[data-field='githubFullUrl']"
+          );
+          const denoUrlInput = cardEl.querySelector(
+            "input[data-field='denoUrl']"
+          );
+          const uploadUrlInput = cardEl.querySelector(
+            "input[data-field='uploadUrl']"
+          );
+
+          if (githubPathInput && githubFullUrlDisplay) {
+            githubPathInput.addEventListener("input", () => {
+              const currentBase = (els.githubBase.value || "").trim();
+              const path = githubPathInput.value.trim();
+              const full =
+                currentBase && path ? joinUrl(currentBase, path) : "";
+              githubFullUrlDisplay.textContent =
+                full || "GitHub 기본 주소 + 경로로 전체 URL이 표시됩니다.";
+              saveState();
+            });
+          }
+
+          [denoUrlInput, uploadUrlInput].forEach((inputEl) => {
+            if (!inputEl) return;
+            inputEl.addEventListener("input", () => {
+              saveState();
+            });
+          });
+
+          els.cardsContainer.appendChild(cardEl);
         });
       }
-      return result;
-    }
 
-    function renderTools(tools) {
-      const tbody = document.getElementById("tools-tbody");
-      tbody.innerHTML = "";
-      const search = (document.getElementById("search-input").value || "").toLowerCase();
+      /** URL 합치기 (베이스/슬러그) */
+      function joinUrl(base, path) {
+        const b = (base || "").replace(/\/+$/, "");
+        const p = (path || "").replace(/^\/+/, "");
+        if (!b) return p;
+        if (!p) return b;
+        return b + "/" + p;
+      }
 
-      let ok = 0, warn = 0, err = 0;
+      /** HTML escape */
+      function escapeHtml(str) {
+        return String(str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
 
-      const filtered = tools.filter(t => {
-        if (!search) return true;
-        return (
-          (t.id + "").includes(search) ||
-          (t.name || "").toLowerCase().includes(search)
+      /** 상태별 css class */
+      function statusClass(status) {
+        if (status === "ok") return "ok";
+        if (status === "warn") return "warn";
+        if (status === "error") return "error";
+        return "";
+      }
+
+      function dotClass(status) {
+        if (status === "ok") return "dot-ok";
+        if (status === "warn") return "dot-warn";
+        if (status === "error") return "dot-error";
+        return "";
+      }
+
+      function statusText(status) {
+        if (status === "ok") return "테스트 통과";
+        if (status === "warn") return "경고 있음";
+        if (status === "error") return "오류 있음";
+        return "테스트 미실행";
+      }
+
+      /** 전체 자동 테스트 1회 */
+      function runTestsOnce() {
+        const cards = els.cardsContainer.querySelectorAll("[data-card-index]");
+        if (!cards.length) {
+          els.testSummaryText.textContent =
+            "테스트 대상 카드가 없습니다. 먼저 '카드 생성 / 갱신'을 눌러 도구 카드를 만들세요.";
+          saveState();
+          return;
+        }
+
+        let okCount = 0;
+        let warnCount = 0;
+        let errorCount = 0;
+
+        cards.forEach((card) => {
+          const githubBase = (els.githubBase.value || "").trim();
+          const githubPathInput = card.querySelector(
+            "input[data-field='githubPath']"
+          );
+          const denoUrlInput = card.querySelector(
+            "input[data-field='denoUrl']"
+          );
+          const uploadUrlInput = card.querySelector(
+            "input[data-field='uploadUrl']"
+          );
+
+          const fullGithubUrl =
+            githubBase && githubPathInput && githubPathInput.value.trim()
+              ? joinUrl(githubBase, githubPathInput.value.trim())
+              : "";
+
+          const urls = [
+            fullGithubUrl,
+            denoUrlInput ? denoUrlInput.value.trim() : "",
+            uploadUrlInput ? uploadUrlInput.value.trim() : "",
+          ];
+
+          let hasProblem = false;
+          let hasCritical = false;
+
+          urls.forEach((u) => {
+            if (!u) return;
+            if (!/^https?:\/\//i.test(u)) {
+              hasProblem = true;
+              if (/^javascript:/i.test(u)) {
+                hasCritical = true;
+              }
+            }
+          });
+
+          let status = "ok";
+          if (hasCritical) {
+            status = "error";
+            errorCount += 1;
+          } else if (hasProblem) {
+            status = "warn";
+            warnCount += 1;
+          } else {
+            okCount += 1;
+          }
+
+          card.setAttribute("data-status", status);
+          const statusEl = card.querySelector(".tool-status");
+          const dotEl = card.querySelector(".tool-status .dot");
+          const textEl = card.querySelector(".tool-status-text");
+
+          if (statusEl && dotEl && textEl) {
+            statusEl.classList.remove("ok", "warn", "error");
+            statusEl.classList.add(statusClass(status));
+
+            dotEl.classList.remove("dot-ok", "dot-warn", "dot-error");
+            dotEl.classList.add(dotClass(status));
+
+            textEl.textContent = statusText(status);
+          }
+        });
+
+        const total = cards.length;
+        els.testSummaryText.textContent = `총 ${total}개 카드 중 정상 ${okCount}개 · 경고 ${warnCount}개 · 오류 ${errorCount}개 (문자열 규칙 기준)`;
+        saveState();
+      }
+
+      /** 전체 초기화 */
+      function resetAll() {
+        if (!confirm("모든 입력과 카드, 저장된 데이터가 초기화됩니다. 계속하시겠습니까?")) {
+          return;
+        }
+        els.toolList.value = "";
+        els.githubBase.value = "";
+        els.denoBase.value = "";
+        els.uploadBase.value = "";
+        els.cardsContainer.innerHTML = "";
+        els.testSummaryText.textContent = "아직 수행된 테스트가 없습니다.";
+        try {
+          localStorage.removeItem(STORAGE_KEY);
+        } catch (e) {}
+        updateAutoSaveIndicator("idle");
+      }
+
+      /** 이벤트 연결 */
+      function bindEvents() {
+        els.btnGenerate.addEventListener("click", () => {
+          generateCards();
+        });
+
+        els.btnRunTests.addEventListener("click", () => {
+          runTestsOnce();
+        });
+
+        els.btnReset.addEventListener("click", () => {
+          resetAll();
+        });
+
+        [els.toolList, els.githubBase, els.denoBase, els.uploadBase].forEach(
+          (input) => {
+            input.addEventListener("input", () => {
+              // GitHub 기본 주소가 바뀌면 카드의 full URL 표시도 같이 갱신
+              if (input === els.githubBase) {
+                const cards = els.cardsContainer.querySelectorAll(
+                  "[data-card-index]"
+                );
+                cards.forEach((card) => {
+                  const pathInput = card.querySelector(
+                    "input[data-field='githubPath']"
+                  );
+                  const display = card.querySelector(
+                    "[data-field='githubFullUrl']"
+                  );
+                  if (!pathInput || !display) return;
+                  const base = (els.githubBase.value || "").trim();
+                  const path = pathInput.value.trim();
+                  const full =
+                    base && path ? joinUrl(base, path) : "";
+                  display.textContent =
+                    full || "GitHub 기본 주소 + 경로로 전체 URL이 표시됩니다.";
+                });
+              }
+              saveState();
+            });
+          }
         );
-      });
-
-      for (const t of filtered) {
-        const tr = document.createElement("tr");
-
-        let statusClass = "";
-        if (t.status === "정상") {
-          ok++;
-          statusClass = "badge-ok";
-        } else if (t.status === "경고") {
-          warn++;
-          statusClass = "badge-warn";
-        } else if (t.status === "오류") {
-          err++;
-          statusClass = "badge-error";
-        }
-
-        tr.innerHTML = `
-          <td>${t.id}</td>
-          <td>${t.name}</td>
-          <td><span class="${statusClass}" style="padding:2px 6px;border-radius:999px;font-size:11px;">${t.status || "미연결"}</span></td>
-          <td>${t.repo ? `<a href="${t.repo}" target="_blank">열기</a>` : "-"}</td>
-          <td>${t.deploy ? `<a href="${t.deploy}" target="_blank">열기</a>` : "-"}</td>
-          <td>${t.lastTest || "-"}</td>
-          <td>
-            <button class="small" data-action="status" data-id="${t.id}">상태표시</button>
-            <button class="small" data-action="detail" data-id="${t.id}">세부 보기</button>
-          </td>
-        `;
-        tbody.appendChild(tr);
       }
 
-      // 상태 요약 반영
-      document.getElementById("tool-count").textContent = tools.length;
-      document.getElementById("summary-ok").textContent = "정상 " + ok;
-      document.getElementById("summary-warn").textContent = "경고 " + warn;
-      document.getElementById("summary-error").textContent = "오류 " + err;
-      document.getElementById("last-updated").textContent = nowTimeString();
-      document.getElementById("engine-status").textContent = "정상";
-      document.getElementById("complex-errors").textContent = "0";
-
-      if (tools.length === 0) {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td colspan="7" style="text-align:center;color:#6b7280;font-size:12px;">
-            표시할 도구가 없습니다. “도구 목록 붙여넣기” 버튼을 눌러 목록을 저장해 보세요.
-          </td>`;
-        tbody.appendChild(tr);
-      }
-    }
-
-    function init() {
-      const tools = loadToolsFromStorage();
-      renderTools(tools);
-
-      // 검색
-      document.getElementById("search-input").addEventListener("input", () => {
-        renderTools(loadToolsFromStorage());
+      document.addEventListener("DOMContentLoaded", () => {
+        bindEvents();
+        loadState();
       });
-      document.getElementById("clear-search-btn").addEventListener("click", () => {
-        document.getElementById("search-input").value = "";
-        renderTools(loadToolsFromStorage());
-      });
-
-      // 도구 목록 새로 불러오기 (= 저장된 값 다시 그림)
-      document.getElementById("reload-tools-btn").addEventListener("click", () => {
-        renderTools(loadToolsFromStorage());
-      });
-
-      // 붙여넣기 패널 열기/닫기
-      const pastePanel = document.getElementById("paste-panel");
-      document.getElementById("open-paste-panel-btn").addEventListener("click", () => {
-        const toolsText = loadToolsFromStorage()
-          .map(t => `${t.id}, ${t.name}, ${t.status}`)
-          .join("\n");
-        document.getElementById("tools-input").value = toolsText || 
-          "1, 1번 고객 자동화 안내서, 미연결\n7, 7번 세팅 도구, 정상\n20, 20번 운영 매뉴얼, 오류";
-        pastePanel.style.display = "block";
-      });
-      document.getElementById("cancel-paste-btn").addEventListener("click", () => {
-        pastePanel.style.display = "none";
-      });
-
-      // 도구 목록 저장
-      document.getElementById("save-tools-btn").addEventListener("click", () => {
-        const text = document.getElementById("tools-input").value || "";
-        const parsed = parseToolsFromText(text);
-        saveToolsToStorage(parsed);
-        renderTools(parsed);
-        pastePanel.style.display = "none";
-      });
-
-      // 상태표시 / 세부 보기 버튼 (자리만)
-      document.getElementById("tools-tbody").addEventListener("click", (ev) => {
-        const btn = ev.target.closest("button");
-        if (!btn) return;
-        const action = btn.getAttribute("data-action");
-        const id = btn.getAttribute("data-id");
-        if (action === "status") {
-          alert(id + "번 도구 상태 표시(예시 단계)입니다.");
-        } else if (action === "detail") {
-          alert(id + "번 도구 세부 보기(예시 단계)입니다.");
-        }
-      });
-    }
-
-    document.addEventListener("DOMContentLoaded", init);
+    })();
   </script>
 </body>
 </html>
