@@ -32,6 +32,9 @@ function prepareContactCopy(state,ctx,reply){
   if(state.explicit_stop_or_rejection===true)return hold("DO_NOT_CONTACT");
   if(state.current_affiliation_verified!==true||state.contact_history_verified!==true)return hold("CUSTOMER_STATE_UNVERIFIED");
   if(!ctx||ctx.evidence_verified!==true||["source_ref","history_kind","plain_topic","addressee"].some(k=>!ctx[k]))return hold("COPY_EVIDENCE_MISSING");
+  // Local candidate: no promotion until approved history and semantic review exist.
+  const history=retrieveCopyHistory(ctx);
+  if(history.status!=="RETRIEVED_APPROVED")return {...hold(history.status),history_review:history,send_allowed:false};
   const kind=ctx.history_kind,topic=ctx.plain_topic;
   const histories={one_way:"지난번 회사소개서를 보내드렸습니다.",response:`지난 통화에서 ${ctx.requested_format||topic}를 말씀해 주셨는데요.`,quote:`문의하신 ${topic} 견적 건으로 연락드렸습니다.`,purchase:`전에 구매하신 ${topic} 건으로 연락드렸습니다.`,none:"자료 검토 방향을 짧게 여쭤보려고 연락드렸습니다."};
   if(!histories[kind])return hold("UNKNOWN_HISTORY_KIND");
@@ -61,7 +64,16 @@ function validateContactCopy(r){
   if(['one_way','none'].includes(r.history_kind)&&/문의하신|구매하신|말씀해 주셨/.test(text))issues.push("OUTBOUND_HISTORY_AS_CUSTOMER_RESPONSE");
   return issues;
 }
-module.exports={branchCustomer,prepareContactCopy,validateContactCopy};
+function retrieveCopyHistory(ctx){
+  const fs=require('fs'),path=require('path');
+  try{
+    const corpus=JSON.parse(fs.readFileSync(path.join(__dirname,'../fixtures/contact_copy_history.json'),'utf8'));
+    const matched=corpus.records.filter(r=>r.history_kind===ctx.history_kind);
+    const approved=matched.filter(r=>r.verdict==='USER_APPROVED'&&r.approval_source_ref);
+    return {status:approved.length?'SEMANTIC_REVIEW_REQUIRED':'APPROVED_HISTORY_MISSING',matched_ids:matched.map(r=>r.id),source_scopes:Object.keys(corpus.sources),scope:corpus.scope,approved_count:approved.length};
+  }catch(e){return {status:'HISTORY_CORPUS_UNAVAILABLE'};}
+}
+module.exports={branchCustomer,prepareContactCopy,validateContactCopy,retrieveCopyHistory};
 if(require.main===module){
   const p=JSON.parse(require('fs').readFileSync(0,'utf8'));
   const out=prepareContactCopy(p.state||{},p.context,p.reply);
