@@ -1,9 +1,24 @@
 {
-  "status": "DEPLOYED_READY",
+  "status": "REPRESENTATIVE_1_ONLY_PASS",
   "remote_commit": "e2ad53ad0f0f72ddba0844eb8065a89c737ef5f3",
   "remote_readback": "PASS",
   "actual_use_deploy": "repo42",
   "deployed_copy_e2e": "PASS",
+  "customer_independent_normal_output": "NOT_VERIFIED",
+  "format_stability": "HOLD_REQUIRES_SECOND_ACTUAL_CUSTOMER",
+  "representative_customer_count": 1,
+  "representative_cases": {
+    "CASE_A": "김명곤 / PASS",
+    "CASE_B": "NOT_AVAILABLE_AS_COMPLETE_EXPECTED_OUTPUT_FIXTURE",
+    "CASE_C": "NOT_AVAILABLE_AS_COMPLETE_EXPECTED_OUTPUT_FIXTURE"
+  },
+  "common_runtime_checks": {
+    "no_customer_name_hardcoding": "PASS",
+    "no_customer_specific_path": "PASS",
+    "no_fixture_specific_exception": "PASS",
+    "common_runtime_path": "PASS",
+    "common_format_contract": "PASS"
+  },
   "internal_chain": [
     "legacy_branch_wrapper",
     "canonical_preload",
@@ -17,7 +32,10 @@
     "user_visible_output_sha256": "8a08753ba9680144885d2a80f2adce2db4c26574890624f7f5c424404033b08e"
   },
   "internal_blockers": [],
-  "only_external_input": "APPROVED_CUSTOMER_COPY_EVIDENCE",
+  "remaining_external_inputs": [
+    "APPROVED_CUSTOMER_COPY_EVIDENCE",
+    "SECOND_ACTUAL_CUSTOMER_COMPLETE_EXPECTED_OUTPUT_FIXTURE"
+  ],
   "user_action_queue": [
     "김명곤 고객에게 사용할 최종 고객별 문구 승인"
   ],
