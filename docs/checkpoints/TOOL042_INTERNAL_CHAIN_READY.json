@@ -1,5 +1,9 @@
 {
-  "status": "DEPLOYED_READY_PENDING_REMOTE_AND_DEPLOYED_COPY_TEST",
+  "status": "DEPLOYED_READY",
+  "remote_commit": "e2ad53ad0f0f72ddba0844eb8065a89c737ef5f3",
+  "remote_readback": "PASS",
+  "actual_use_deploy": "repo42",
+  "deployed_copy_e2e": "PASS",
   "internal_chain": [
     "legacy_branch_wrapper",
     "canonical_preload",
