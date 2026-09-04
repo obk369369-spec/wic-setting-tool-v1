@@ -1,0 +1,28 @@
+{
+  "status": "DEPLOYED_READY_PENDING_REMOTE_AND_DEPLOYED_COPY_TEST",
+  "internal_chain": [
+    "legacy_branch_wrapper",
+    "canonical_preload",
+    "evidence_bound_semantic_review",
+    "guidance_renderer",
+    "STRICT_FULL_V1_output_gate"
+  ],
+  "group_d": {
+    "report_count": 3,
+    "toc_line_counts": [37, 106, 76],
+    "user_visible_output_sha256": "8a08753ba9680144885d2a80f2adce2db4c26574890624f7f5c424404033b08e"
+  },
+  "internal_blockers": [],
+  "only_external_input": "APPROVED_CUSTOMER_COPY_EVIDENCE",
+  "user_action_queue": [
+    "김명곤 고객에게 사용할 최종 고객별 문구 승인"
+  ],
+  "approved_copy_evidence_search": {
+    "scope": [
+      "TOOL042 MASTER/checkpoints",
+      "TOOL042 Kim Myeong-gon fixtures and outputs",
+      "CENTRAL contact_copy_actual_cases.json"
+    ],
+    "result": "NOT_FOUND"
+  }
+}

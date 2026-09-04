@@ -150,3 +150,55 @@
 - 출력게이트 수정 Commit SHA: `3caea5a9983bf5c6448d51b69e74ba6035257151`.
 - 중앙마스터 보강 Commit SHA: `1b8ccafcfc1257d28477ee3ba5125c53452efdef`.
 - 현재 김명곤 안내서는 사용자 실제 화면 검수 전이므로 최종 PASS 아님.
+
+## 2026-08-31 — 41/42 선조회·생성 연결부 증분 작업
+
+- 기존 PASS/VERIFIED 테스트는 SKIP_REUSE. 전수감사·기존 데이터 복원·실제 발송 없음.
+- 최신 CENTRAL/각 TOOL MASTER·checkpoint·실제 피드백·CLEAN 고객 MASTER를 revision 고정으로 읽고 동일 snapshot을 생성에 전달하는 native entry 추가.
+- 이번 native 검증은 GitHub connector로 회수한 정본 snapshot transport replay이며 shell private repo 인증 E2E가 아님.
+- 사용자 과거 설명/첨부/checkpoint 전달 요구 0회. 일일 수동개입 0회 전체 운영은 아직 미증명.
+- 실제 최신 고객 전체 E2E: HOLD. 과거 실제 문구 교정 재현과 현재 고객 검증을 구분.
+- 남은 내부 OPEN: 의미 기반 8항목 전체 검사/자유 재작성, native 작업종료 자동 CENTRAL 저장 트랜잭션, 호환 low-level API를 포함한 모든 진입점 강제.
+- 남은 인증/근거 HOLD: private MASTER 런타임 인증, 실제 실패 고객의 현재 CLEAN MASTER 식별/접촉근거, 실제 판매자료 및 적합성 근거.
+- NEXT_WORK: 현재 고객·자료 근거가 자동으로 연결되면 그 고객 1건만 preflight→생성→검사→정본 저장 E2E. 폐기된 과거 고객 데이터는 복구하지 않는다.
+- 중앙 증거: customer_pipeline/TOOL041_042_AUTOMATION_20260831.json.
+- TOOL042: `scripts/customer_work_start.js`; 기존 branch CLI도 이 entry 사용. 9-source preflight→generation. FAIL turns/cue_card 누출 제거 및 자료 paid/tradable/source 필수화. 변경부 5개 검사 PASS; ROB-010 현재 경로는 CURRENT_MASTER_ID_NOT_UNIQUE HOLD. 과거 교정 1회는 DRAFT_VALIDATED이며 실제 고객 PASS 아님.
+
+## 2026-08-31 — 단일 FAIL-CLOSED 출력 경계 연결
+
+- 기존 c53e4b142ae6bc8f71a5572e388188bc0f660c7f PASS는 SKIP_REUSE; 전수조사/기존 fixture 재실행 없음.
+- CENTRAL `customer_pipeline/customer_release_gate.py` 동일 코드가 41·42에 배포되며, 선조회 source와 구현 본문 불일치 시 HOLD.
+- 공개 native 진입점과 guidance emit 경로는 공통 최종 게이트를 거친다. 기존 내부 생성기/format test는 출력 허가가 아니다.
+- 실제 과거 실패 입력 2건의 원문을 그대로 넣어 USER_EXPLICIT_FAIL 차단, 기존 교정안으로 각 1회 내부 재작성. 재작성문도 최종 의미판정 없이는 출력하지 않음.
+- 8항목 의미실행기 미연결: 전 항목 HOLD_NOT_EXECUTED. 현재 revision은 고객 PASS 출력 자체를 허용하지 않음. 정규식/해시 로그를 의미검사 완료로 주장하지 않음.
+- 사용자 지정 고객은 제한 검색과 현재 CLEAN MASTER에서 연결 근거 미확보. 다른 고객으로 대체하거나 과거 삭제 데이터를 복원하지 않음.
+- Native 저장은 기존 CENTRAL root의 redacted CAS update/read-back/idempotency 연결. 모의 검증 PASS와 실제 인증 저장 미검증을 구분.
+- 내부 OPEN: 실제 의미실행기, 자연어 구규칙 충돌 해결, 자유 재작성. HOLD: 지정 고객 현재 식별/접촉·실패원문·실제 자료 및 runtime 인증.
+- NEXT_WORK: 실제 source/customer/output-bound 의미실행기 및 해당 고객 근거가 연결되면 남은 positive 고객 E2E/인증 저장만 검증. 이번 차단경계 검사는 반복 금지.
+- 증거: CENTRAL `customer_pipeline/TOOL041_042_RELEASE_GATE_20260831.json`. 사용자 수동 전달 0회, 실제 발송 없음.
+
+## 2026-09-02 — 최신 피드백·김지혜 작업 체크포인트
+- 중앙마스터 §46에 최신 사용자 지시를 실제 반영: 현재 2026 작업은 실제 2026년 발행자료만 사용, 원 발행사 실제 TOC를 끝까지 정확히 정리할 수 없는 자료/발행사는 제외 후 교체, 공식 전체 영문 타이틀 유지, 특정 오류만 지적한 경우 불필요한 전면 재작성 금지, 도서정보 2줄 복사용 고정형 유지, 기발송·기안내·기견적·기구매 보고서 중복 제외.
+- 중앙마스터 반영 Commit SHA: `b96b0ff94b74ea8bd17ea1963e28e53f172ff616`; 원격 read-back master blob SHA: `3e00bffd4837fefd43a398ad223cf3bda83b2fa9`.
+- 현재 고객: 탄소수소산업연구조합 김지혜 팀장 / 기업성장지원팀.
+- 고객 직접 요청축: ISO 22821 산업수요, NFRP 강도측정, NFRP 국내외 시장 특히 운송·수송·모빌리티, ASTM C297 산업수요, 우주항공 국제·국내 표준, CFRP/NFRP 복합재 시험평가.
+- 중복 제외 확정: 과거 안내 `Natural Fiber Reinforced Plastic Market Research Report...`, 과거 안내 `Aerospace Floor Panels Market Size & Share...`, 실제 구매 `Global Structural Core Materials Market Size By Product...`.
+- 현재 안내서 상태: 신규 3종을 2026 발행 + 서로 다른 거래 발행사 + 원 발행사 exact TOC + 기제시/기구매 중복 없음 기준으로 재선정/검증 중. 실제 고객 출력 게이트 PASS 전에는 최종 안내서로 표시하지 않는다.
+
+## 2026-09-02 — 분야 중복 차단 및 다음 구매 가능성 확장 규칙 반영
+- 중앙마스터 §47에 고객 안내서를 만드는 대화창/작업에만 적용되는 공통 규칙을 추가했다.
+- 단순 제목·링크 중복이 아니라 **기안내·기구매·기납품 분야 자체의 중복**을 차단한다.
+- 실제 납품·구매 분야는 `충족 분야`로 보고, 같은 수준의 유사 시장보고서를 다시 추천하지 않는다.
+- 과거 문의·납품은 관심 증거이자 출발점으로 사용하고, 온라인 현재 연구/사업축과 연결해 그 다음 단계의 기술·응용·상용화·신규소재·제조·재활용·신규시장으로 확장한다.
+- 최종 3종은 `과거와 연결성 있음 + 새 구매 이유 있음`을 동시에 만족해야 한다.
+- 김지혜의 기존 복합재 일반/시험평가/Structural Core Materials 축은 이번 재출력에서 기본 제외축으로 처리한다. 단, 현재 온라인 사업과 연결되는 다음 단계 응용시장 후보를 새로 조사한다.
+- BCC 표시는 고객용 안내서에서 `BCC Research`를 사용한다.
+- 다음 대화창에서는 김지혜 자료를 처음부터 다시 찾는 것이 아니라, 이 체크포인트와 중앙마스터를 선조회하고 마지막 지점에서 이어간다.
+
+## 2026-09-02 — 대화창 종료 직전 최신 사용자 피드백
+- 직전 재선정 결과에서 **목차가 빠진 것은 오류**로 확정했다. 다음 대화창 재출력에서는 추천자료 1·2·3 각각에 원 발행사 실제 Table of Contents의 상위+직접 하위 2단계를 시작부터 마지막 공개 항목까지 반드시 포함한다.
+- `목차:` 라벨만 두거나 목차 없이 제목/도서정보/링크/보고서정보만 출력하면 FAIL 처리한다.
+- `보고서 정보:` 형식은 현재처럼 유지하되, 바로 이어서 `원문 위치:`를 표시한다.
+- `원문 위치:`에는 같은 원 발행사 상세페이지에서 실제 확인한 섹션/헤딩명을 적는다. 예: `Report Highlights`, `Market Insights`, `Executive Summary`. 위치가 불명확하면 추정하지 않고 `확인 필요`로 둔다.
+- 다음 대화창 첫 작업은 **김지혜 안내서 재출력**이다. 과거 납품/안내 분야 중복을 제외하고, 다음 구매 가능성이 있는 새 분야 3종을 2026년 실제 발행자료로 선정한 뒤 각 자료의 전체 공식 타이틀, 도서정보 2줄, 순수 URL, exact TOC, 보고서정보 원문 직역, 원문 위치까지 포함한다.
+- 중앙마스터 신규 규칙 위치: §48.

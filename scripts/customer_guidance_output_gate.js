@@ -78,6 +78,20 @@ function validateCustomerGuidanceOutput(output,expected){
  return{status:errors.length?"FAIL":holds.length?"HOLD":"PASS",errors:uniq(errors),holds:uniq(holds),checks,output_sha256:actualHash};
 }
 
+function renderCustomerGuidance(expected){
+ const blocks=(expected.reports||[]).map((r,i)=>[
+  `추천자료 ${i+1}`,
+  `## 영문 제목: ${r.english_title}`,
+  `## 한글 제목: ${r.korean_title}`,
+  `◇ 발행사: ${r.publisher}${' '.repeat(25)}( ${r.pages||''} Pages )${' '.repeat(8)}◇ 정가: ${r.price_display||''}`,
+  `◇ 발행일: ${r.publication_date_display||''}${' '.repeat(18)}-PDF-${' '.repeat(8)}◆ 공급가격: `,
+  `자세한 내용의 링크: ${r.url}`,
+  '목차:',...(r.toc_lines||[]),'보고서 정보:',r.report_info_ko_exact||''
+ ].join('\n'));
+ return [`메일 제목: [해외시장자료 안내] ${expected.institution} ${expected.name}님`,
+  `이메일 주소: ${expected.email}`,blocks.join('\n\n')].join('\n')+'\n';
+}
+
 function selfTest(){
  const s="a".repeat(40);
  const makeBase=count=>({institution:"기관",name:"고객",email:"a@b.com",required_report_count:count,prior_send_history_verified:true,validation_contract:"STRICT_FULL_V1",evidence:{work_start_rules_sha:s,work_start_checkpoint_sha:s,pre_output_rules_sha:s,pre_output_checkpoint_sha:s},feedback_evidence:{master_commit_sha:s,checkpoint_commit_sha:s,remote_readback_match:true},reports:Array.from({length:count},(_,i)=>{const n=i+1;return{english_title:`Title ${n}`,korean_title:`제목 ${n}`,publisher:`Pub ${n}`,pages:"100",price_display:"$ 1",publication_date_display:"2026년",url:`https://example.com/${n}`,toc_contract:"EXACT_FULL",toc_source_verified:true,toc_lines:["1. Main","  1.1 Sub","2. End"],report_info_ko_exact:"정보"}})});
@@ -97,13 +111,26 @@ function selfTest(){
  return{status:"PASS",tests};
 }
 
-if(typeof module!=="undefined")module.exports={validateCustomerGuidanceOutput};
+if(typeof module!=="undefined")module.exports={validateCustomerGuidanceOutput,renderCustomerGuidance};
 if(typeof require!=="undefined"&&require.main===module){
  const fs=require("fs"),a=process.argv.slice(2);
  if(a[0]==="--self-test"){process.stdout.write(JSON.stringify(selfTest(),null,2)+"\n");process.exit(0);}
+ if(a[0]==="--render"){
+  const expected=JSON.parse(fs.readFileSync(a[1],"utf8")),rendered=renderCustomerGuidance(expected);
+  if(a[2])fs.writeFileSync(a[2],rendered,"utf8");else process.stdout.write(rendered);
+  process.exit(0);
+ }
  const emit=a[0]==="--emit-if-pass",o=emit?a[1]:a[0],e=emit?a[2]:a[1];
  if(!o||!e){process.stderr.write("Usage: node customer_guidance_output_gate.js [--emit-if-pass] <output.txt> <expected.json> | --self-test\n");process.exit(2);}
  const raw=fs.readFileSync(o,"utf8"),r=validateCustomerGuidanceOutput(raw,JSON.parse(fs.readFileSync(e,"utf8")));
- if(emit&&r.status==="PASS")process.stdout.write(raw);else process.stdout.write(JSON.stringify(r,null,2)+"\n");
- process.exit(r.status==="PASS"?0:1);
+ if(emit){
+  const expected=JSON.parse(fs.readFileSync(e,"utf8"));
+  require('./customer_work_start').loadCanonical().then(context=>{
+    const result=require('./customer_release_bridge').release(context,{text:raw,format_check:r,customer_id:expected.customer_id});
+    process.stdout.write(JSON.stringify(result)+"\n");process.exitCode=2;
+  }).catch(()=>{process.stdout.write(JSON.stringify(require('./customer_release_bridge').release({},{}))+"\n");process.exitCode=2;});
+ }else{
+  process.stdout.write(JSON.stringify({...r,output_allowed:false,scope:"FORMAT_DIAGNOSTIC_ONLY_NOT_CUSTOMER_RELEASE"},null,2)+"\n");
+  process.exitCode=r.status==="PASS"?0:1;
+ }
 }
