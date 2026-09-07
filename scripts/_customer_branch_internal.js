@@ -11,7 +11,15 @@ function branchCustomer(state, candidates) {
   const type = state.customer_type || (/정책|지원|연구|진흥|공공/.test([state.department,...state.business_directions].join(" ")) ? "RESEARCH_POLICY" : "ENTERPRISE");
   const axes = [...state.business_directions,...state.current_interests].map(x=>String(x).toLowerCase());
   const prior = new Set((state.prior_sent_titles||[]).map(x=>String(x).toLowerCase()));
-  const eligible = (candidates||[]).filter(x => x.verified === true && x.paid === true && x.tradable === true && ['title','publisher','publication_date','link','source_ref'].every(k=>typeof x[k]==='string'&&x[k].trim()) && /^https:\/\//.test(x.link) && !prior.has(String(x.title).toLowerCase()) && (x.direct_match === true || (x.topics||[]).some(t=>axes.some(a=>a.includes(String(t).toLowerCase())||String(t).toLowerCase().includes(a)))));
+  const eligible = (candidates||[]).filter(x =>
+    x.verified === true && x.paid === true && x.tradable === true &&
+    x.provenance_verified === true && x.original_publisher_verified === true &&
+    x.official_detail_page === true && x.reseller_checked === true && x.is_reseller !== true &&
+    x.toc_source_verified === true &&
+    ['title','publisher','publication_date','link','source_ref'].every(k=>typeof x[k]==='string'&&x[k].trim()) &&
+    /^https:\/\//.test(x.link) && !prior.has(String(x.title).toLowerCase()) &&
+    (x.direct_match === true || (x.topics||[]).some(t=>axes.some(a=>a.includes(String(t).toLowerCase())||String(t).toLowerCase().includes(a))))
+  );
   const distinct=[] , publishers=new Set();
   for(const item of eligible){if(!publishers.has(item.publisher)){publishers.add(item.publisher);distinct.push(item);}}
   const required=Number(state.required_recommendation_count||3);
